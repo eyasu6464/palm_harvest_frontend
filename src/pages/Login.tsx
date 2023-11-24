@@ -2,7 +2,7 @@ import { Button, Input, Form } from 'antd'
 import { UserOutlined } from '@ant-design/icons';
 import AumkarVertival from '../images/AumkarVertical.png'
 
-const Login = () => {
+const Login = ({setLogin}:any) => {
   return (
     <div>
         <section className="flex flex-col md:flex-row h-screen justify-center items-center">

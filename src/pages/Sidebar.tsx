@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import { useState } from 'react'
 
 const Sidebar = () => {
     const [open, setOpen] = useState(true)
@@ -24,7 +24,7 @@ const Sidebar = () => {
                     </div>
 
                 <ul className='pt-6'>
-                    {Menus.map((menu, index) => (
+                    {Menus.map((menu) => (
                             <li
                                 className={`flex items-center gap-x-2 p-1 text-base font-normal rounded-lg cursor-pointer dark:text-zinc-700 hover:bg-gray-200 dark:hover:bg-white dark:hover:shadow-lg
                         ${menu.gap ? 'mt-4' : 'mt-2'} ${

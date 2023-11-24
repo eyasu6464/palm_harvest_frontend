@@ -1,12 +1,23 @@
 import './App.css'
+import { useState } from 'react'
 import Login from './pages/Login'
-import Navbar from './pages/Navbar'
+import DashboardMain from './pages/DashboardMain'
 
 function App() {
-
+  const [login, setLogin] = useState(true)
   return (
     <>
-      <Login/>
+      {
+        login? (
+        <>
+          <Login setLogin={setLogin}/>
+        </>
+        ):(
+        <>
+          <DashboardMain/>
+        </>
+        )
+      }
     </>
   )
 }
