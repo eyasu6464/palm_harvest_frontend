@@ -1,8 +1,72 @@
-import { Button, Input, Form } from 'antd'
+import { useState, useEffect } from 'react'
+import { Button, Input, Form, notification } from 'antd'
 import { UserOutlined } from '@ant-design/icons';
 import AumkarVertival from '../images/AumkarVertical.png'
+import axios from 'axios';
+import { URL } from '../redux/ActionTypes';
+import { getCookie, setCookie } from 'typescript-cookie'
+import { useDispatch } from 'react-redux';
+import { add_user_information } from '../redux/Actions';
 
 const Login = ({setLogin}:any) => {
+    const dispatch = useDispatch()
+    const [loading, setLoading] = useState(false)
+    async function getLogin(values:any){
+        try{
+            const response = await axios.post(URL + 'token/', values);
+            try{
+                const res = await axios.get(URL + 'userinformation/',{
+                    headers: {
+                      Authorization: `Bearer ${response.data.access}`,
+                      'Content-Type': 'application/json',
+                    },
+                  });
+                  setCookie("userAccessKey", response.data.access,{ expires: 1 })
+                  dispatch(add_user_information(res.data))
+                  setLogin(false);
+                  console.log(res.data);
+            }
+            catch(error){
+                console.log(error)
+            }
+            setLoading(false)
+        }
+        catch(error){
+            console.log(error)
+            notification.error({
+                message: "Login Failed",
+                duration: 5,
+                onClose: () => {
+                  console.log('Notification closed');
+                },
+              });
+            setLoading(false)
+        }
+    }
+    const onFinish = async (values:any) => {
+        setLoading(true)
+        getLogin(values);
+    }
+    useEffect(() => {
+        async function createlogin(userAccessKey:any){
+            try{
+                const response = await axios.get(URL + 'userinformation/',{
+                    headers: {
+                      Authorization: `Bearer ${userAccessKey}`,
+                      'Content-Type': 'application/json',
+                    },
+                  });
+                  dispatch(add_user_information(response.data))
+                  setLogin(false)
+            }
+            catch(error){
+                console.log(error)
+            }
+        }
+        if(getCookie("userAccessKey")){
+            createlogin(getCookie("userAccessKey"))
+          }
+    }, [])
   return (
     <div>
         <section className="flex flex-col md:flex-row h-screen justify-center items-center">
@@ -19,6 +83,7 @@ const Login = ({setLogin}:any) => {
                     name="basic"
                     autoComplete="off"
                     layout="vertical"
+                    onFinish={onFinish}
                     >
                     <div>
                     <Form.Item
@@ -44,10 +109,26 @@ const Login = ({setLogin}:any) => {
 
                     <div className="text-right mt-2">
                     <a href="#" className="text-sm font-semibold text-gray-700 hover:text-blue-700 focus:text-blue-700">Forgot Password?</a>
-                    </div>                
-                    <Button htmlType="submit"className="w-full" style={{ backgroundColor: '#ff6929', color: 'white' }}>
-                    Login
-                    </Button>
+                    </div>
+                    {loading ? (
+                        <Button 
+                            type="primary" 
+                            htmlType="submit"
+                            className="login-form-button"
+                            style={{ backgroundColor: '#ff6929', color: 'white' }}
+                            loading>
+                        Loading
+                        </Button>
+                    ) : (
+                        <Button 
+                            type="primary" 
+                            htmlType="submit"
+                            className="login-form-button"
+                            style={{ backgroundColor: '#ff6929', color: 'white' }}
+                        >
+                        Login
+                        </Button>
+                    )}                
                     </Form>
 
                 <hr className="my-6 border-gray-300 w-full"/>
