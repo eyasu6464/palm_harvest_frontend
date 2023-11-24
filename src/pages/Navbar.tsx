@@ -1,4 +1,5 @@
 import AukmarHorizontal from '../images/AumkarHorizontal.png'
+import { Link } from 'react-router-dom'
 import { Avatar } from 'antd';
 import { UserOutlined } from '@ant-design/icons';
 const Navbar = () => {
@@ -7,15 +8,29 @@ const Navbar = () => {
         <nav className="bg-white border-white h-20 dark:bg-white shadow-lg">
             <div className="max-w-screen-xl flex flex-wrap items-center justify-between mx-auto p-4">
                 <div className='flex flex-row justify-between'>
-                    <a href="https://flowbite.com/" className="flex items-center space-x-3 rtl:space-x-reverse">
-                        <img src={AukmarHorizontal} className="h-12" alt="Aumkar Logo" />
-                        <span className="self-center text-2xl text-gray-700 font-semibold whitespace-nowrap">Aumkar</span>
-                    </a>
+                    <Link to="/home">
+                        <div className="flex items-center space-x-3 rtl:space-x-reverse">
+                            <img src={AukmarHorizontal} className="h-12" alt="Aumkar Logo" />
+                            <span className="self-center text-2xl text-gray-700 font-semibold whitespace-nowrap">Aumkar</span>
+                        </div>
+                    </Link>
                     <div className="items-center hidden w-full md:flex md:w-auto md:order-1 ml-24" id="navbar-user">
                         <ul className="flex flex-col font-medium p-4 md:p-0 mt-4 border border-white rounded-lg bg-white md:space-x-8 rtl:space-x-reverse md:flex-row md:mt-0 md:border-0 md:bg-white">
-                            <li>
-                                <a href="#" className="block py-2 px-3 text-gray-900 rounded hover:bg-gray-100 md:hover:bg-transparent md:hover:text-blue-700 md:p-0">Home</a>
-                            </li>
+                            <Link to='/users'>
+                                <li>
+                                    <a href="#" className="block py-2 px-3 text-gray-900 rounded hover:bg-gray-100 md:hover:bg-transparent md:hover:text-blue-700 md:p-0">Users</a>
+                                </li>
+                            </Link>
+                            <Link to='/branches'>
+                                <li>
+                                    <a href="#" className="block py-2 px-3 text-gray-900 rounded hover:bg-gray-100 md:hover:bg-transparent md:hover:text-blue-700 md:p-0">Branches</a>
+                                </li>
+                            </Link>
+                            <Link to='/images'>
+                                <li>
+                                    <a href="#" className="block py-2 px-3 text-gray-900 rounded hover:bg-gray-100 md:hover:bg-transparent md:hover:text-blue-700 md:p-0">Images</a>
+                                </li>
+                            </Link>
                         </ul>
                     </div>
             </div>
