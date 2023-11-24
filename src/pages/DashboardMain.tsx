@@ -25,7 +25,7 @@ const DashboardMain = () => {
   return (
     <div>
         <BrowserRouter>
-            <Navbar/>
+        <Navbar/>
             <Routes>
                 <Route path='/' element={<Home />} />
                 {

@@ -1,8 +1,17 @@
 import AukmarHorizontal from '../images/AumkarHorizontal.png'
+import { useSelector } from "react-redux"
 import { Link } from 'react-router-dom'
 import { Avatar } from 'antd';
 import { UserOutlined } from '@ant-design/icons';
 const Navbar = () => {
+    const userType = useSelector((state:any) => state.userInformation.user_type);
+    const Menus = [
+        { title: 'Users', path:'/users', auth:"Manager"},
+        { title: 'Branches', path: '/branches', auth:"Manager" },
+        { title: 'Images', path: '/allimages', auth:"Manager" },
+        { title: 'MyImages',path:'/images', gap: 'false', auth:"Harvester"},
+    ]
+    const MainLists = Menus.filter((items:any) => items.auth === userType);
   return (
     <div>
         <nav className="bg-white border-white h-20 dark:bg-white shadow-lg">
@@ -16,21 +25,15 @@ const Navbar = () => {
                     </Link>
                     <div className="items-center hidden w-full md:flex md:w-auto md:order-1 ml-24" id="navbar-user">
                         <ul className="flex flex-col font-medium p-4 md:p-0 mt-4 border border-white rounded-lg bg-white md:space-x-8 rtl:space-x-reverse md:flex-row md:mt-0 md:border-0 md:bg-white">
-                            <Link to='/users'>
-                                <li>
-                                    <a href="#" className="block py-2 px-3 text-gray-900 rounded hover:bg-gray-100 md:hover:bg-transparent md:hover:text-blue-700 md:p-0">Users</a>
-                                </li>
-                            </Link>
-                            <Link to='/branches'>
-                                <li>
-                                    <a href="#" className="block py-2 px-3 text-gray-900 rounded hover:bg-gray-100 md:hover:bg-transparent md:hover:text-blue-700 md:p-0">Branches</a>
-                                </li>
-                            </Link>
-                            <Link to='/images'>
-                                <li>
-                                    <a href="#" className="block py-2 px-3 text-gray-900 rounded hover:bg-gray-100 md:hover:bg-transparent md:hover:text-blue-700 md:p-0">Images</a>
-                                </li>
-                            </Link>
+                            {
+                                MainLists.map((menu, index) => (
+                                    <Link to={menu.path} key={index}>
+                                        <li>
+                                            <a href="#" className="block py-2 px-3 text-gray-900 rounded hover:bg-gray-100 md:hover:bg-transparent md:hover:text-blue-700 md:p-0">{menu.title}</a>
+                                        </li>
+                                    </Link>
+                                )) 
+                            }
                         </ul>
                     </div>
             </div>
