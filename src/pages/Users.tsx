@@ -155,15 +155,7 @@ const Users = () => {
     getUsers(getCookie("userAccessKey"))
   }, [])
   return (
-    <div className='mx-8'>
-      <div className='flex justify-center items-center my-4'>
-        <Button type="primary" icon={<PlusOutlined />} onClick={showModal} style={{ backgroundColor: '#ff6929', width:'180px', borderColor: '#ff6929' }}>
-            Add Harvester
-        </Button>
-        <Modal title="Harvester Registration" open={isModalOpen} onCancel={handleCancel} footer={null}>
-          <RegisterHarvesterModal/>    
-        </Modal>
-      </div>
+    <div className='m-8'>
       <Table
         dataSource={extractedData}
         columns={columns}

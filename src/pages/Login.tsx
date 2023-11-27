@@ -8,7 +8,7 @@ import { getCookie, setCookie } from 'typescript-cookie'
 import { useDispatch } from 'react-redux';
 import { add_user_information } from '../redux/Actions';
 
-const Login = ({setLogin}:any) => {
+const Login = ({setLogin, setCreateAccount}:any) => {
     const dispatch = useDispatch()
     const [loading, setLoading] = useState(false)
     async function getLogin(values:any){
@@ -115,7 +115,7 @@ const Login = ({setLogin}:any) => {
                             type="primary" 
                             htmlType="submit"
                             className="login-form-button"
-                            style={{ backgroundColor: '#ff6929', color: 'white' }}
+                            style={{ backgroundColor: '#ff6929', color: 'white', width:'100%' }}
                             loading>
                         Loading
                         </Button>
@@ -124,7 +124,7 @@ const Login = ({setLogin}:any) => {
                             type="primary" 
                             htmlType="submit"
                             className="login-form-button"
-                            style={{ backgroundColor: '#ff6929', color: 'white' }}
+                            style={{ backgroundColor: '#ff6929', color: 'white', width:'100%' }}
                         >
                         Login
                         </Button>
@@ -132,7 +132,10 @@ const Login = ({setLogin}:any) => {
                     </Form>
 
                 <hr className="my-6 border-gray-300 w-full"/>
-                
+                <div className='flex flex-row justify-between items-center w-full mb-8'>
+                    <p>Don't have an account?</p>
+                    <Button type="text" style={{color:"#ff6929",fontWeight:'bolder', fontSize:'16px' }} onClick={()=> setCreateAccount(true)}>Create Account</Button>
+                </div>
                 </div>
             </div>
         </section>
