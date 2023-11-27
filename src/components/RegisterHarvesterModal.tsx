@@ -1,65 +1,65 @@
 import { useState } from 'react';
 import { Form, Input, Button, Select, notification } from 'antd';
-import AumkarVertival from '../images/AumkarVertical.png'
+import AumkarVertival from '../images/AumkarVertical.png';
 import axios from 'axios';
 import { URL } from '../redux/ActionTypes';
 
-
 const { Option } = Select;
 
+const RegisterHarvesterModal = ({ setCreateAccount }: any) => {
+  const [loading, setLoading] = useState(false);
 
-const RegisterHarvesterModal = ({setCreateAccount}:any) => {
-  const [loading, setLoading] = useState(false)
-  async function registerUser(values:any){
-    setLoading(true)
-    if(values.password !== values.confirmPassword){
-      setLoading(false)
+  async function registerUser(values: any) {
+    setLoading(true);
+
+    if (values.password !== values.confirmPassword) {
+      setLoading(false);
       notification.warning({
-        message: "Passwords are different",
+        message: 'Passwords are different',
         duration: 5,
         onClose: () => {
           console.log('Notification closed');
         },
       });
-    }
-    else{
-      try{
-        const response = await axios.post(URL + "registeruser/", values)
-        console.log(response.data)
-        setLoading(false)
-      }
-      catch(error){
-        console.log(error)
+    } else {
+      try {
+        const response = await axios.post(URL + 'registeruser/', values);
+        console.log(response.data);
+        setLoading(false);
+      } catch (error) {
+        console.log(error);
         notification.error({
-          message: "Please Try again",
+          message: 'Please Try again',
           duration: 5,
           onClose: () => {
             console.log('Notification closed');
           },
         });
-        setLoading(false)
+        setLoading(false);
       }
     }
   }
-const onFinish = (values: any) => {
-    console.log('Received form the form: ' , values)
-    registerUser(values)
+
+  const onFinish = (values: any) => {
+    console.log('Received form the form: ', values);
+    registerUser(values);
   };
+
   return (
     <div>
-        <section className="flex flex-col md:flex-row h-screen justify-center items-center">
-            <div className="bg-white shadow-md px-8  flex items-center rounded-2xl justify-center">
-                <div className="w-full h-100">
-                <div className='flex align-center justify-center mb-8'>
+      <section className="flex flex-col md:flex-row h-screen justify-center items-center">
+        <div className="bg-white shadow-md px-8 flex items-center rounded-2xl justify-center w-full md:w-1/2 lg:w-1/3">
+          <div className="w-full h-100">
+            <div className="flex align-center justify-center mb-8"></div>
+            <div className="flex align-center justify-center">
+              <img src={AumkarVertival} alt="" className="h-32 rounded-full" />
             </div>
-            <div className='flex align-center justify-center'>
-                <img src={AumkarVertival} alt="" className="h-32 rounded-full"/>
-            </div>
-                <Form
+            <Form
                   name="registrationForm"
                   onFinish={onFinish}
-                  labelCol={{ span: 10 }}
-                  wrapperCol={{ span: 15 }}
+                  labelCol={{ flex: '150px', span: 30 }}
+                  labelAlign="left"
+                  labelWrap
                 >
                   <Form.Item
                     label="First Name"
@@ -130,8 +130,8 @@ const onFinish = (values: any) => {
                     <Input />
                   </Form.Item>
 
-                  <Form.Item wrapperCol={{ offset: 8, span: 16 }}>
-                    <div className='flex flex-col'>
+                  <Form.Item>
+                    <div className='flex flex-col justify-center items-center'>
                       {
                         loading?(
                         <>
@@ -155,13 +155,14 @@ const onFinish = (values: any) => {
                   </Form.Item>
                 </Form>
 
-                <hr className="my-6 border-gray-300 w-full"/>
-                </div>
-            </div>
-        </section>
+            <hr className="my-6 border-gray-300 w-full" />
+          </div>
+        </div>
+      </section>
     </div>
+  );
+};
 
-  )
-}
+export default RegisterHarvesterModal;
 
-export default RegisterHarvesterModal
+
