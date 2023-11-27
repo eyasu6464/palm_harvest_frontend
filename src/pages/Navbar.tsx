@@ -3,9 +3,17 @@ import { Dropdown, Avatar } from 'antd';
 import { LogoutOutlined, KeyOutlined, UserOutlined } from '@ant-design/icons';
 import type { MenuProps } from 'antd';
 import { useSelector } from "react-redux"
-import { Link } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
+import { setCookie } from 'typescript-cookie'
+
 const Navbar = () => {
+    const navigate = useNavigate();
     const userType = useSelector((state:any) => state.userInformation.user_type);
+    const logout = () =>{
+      navigate("/")
+      setCookie("userAccessKey","false",{ expires: -1 });
+      window.location.reload();
+    }
     const items: MenuProps['items'] = [
         {
           key: '1',
@@ -28,7 +36,7 @@ const Navbar = () => {
         {
           key: '3',
           label: (
-            <div>
+            <div onClick={()=>{logout()}}>
               <p>Logout</p>          
             </div>
           ),

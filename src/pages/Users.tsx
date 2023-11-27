@@ -5,6 +5,7 @@ import axios from 'axios'
 import { URL } from '../redux/ActionTypes';
 import { getCookie } from 'typescript-cookie'
 import RegisterHarvesterModal from '../components/RegisterHarvesterModal';
+import InactiveUsersTable from '../components/tables/InactiveUsersTable';
 
 
 interface User {
@@ -162,6 +163,7 @@ const Users = () => {
         onChange={(pagination, filters, sorter) => console.log(pagination, filters, sorter)}
         scroll={{ x: true }}
       />
+      <InactiveUsersTable/>
     </div>
   );
 };
