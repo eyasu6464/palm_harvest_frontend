@@ -1,13 +1,27 @@
-import { useState } from 'react';
-import { Form, Input, Button, Select, notification } from 'antd';
+import { useEffect, useState } from 'react';
+import { Form, Input, Button, Select, notification, Modal } from 'antd';
 import AumkarVertival from '../images/AumkarVertical.png';
 import axios from 'axios';
 import { URL } from '../redux/ActionTypes';
+import SuccessfullRegistrationModal from './SuccessfullRegistrationModal';
 
 const { Option } = Select;
 
 const RegisterHarvesterModal = ({ setCreateAccount }: any) => {
+  const [isModalOpen, setIsModalOpen] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [branchData, setBranchData] = useState<any[]>([])
+  const showModal = () => {
+    setIsModalOpen(true);
+  };
+
+  const handleOk = () => {
+    setIsModalOpen(false);
+  };
+
+  const handleCancel = () => {
+    setIsModalOpen(false);
+  };
 
   async function registerUser(values: any) {
     setLoading(true);
@@ -26,10 +40,11 @@ const RegisterHarvesterModal = ({ setCreateAccount }: any) => {
         const response = await axios.post(URL + 'registeruser/', values);
         console.log(response.data);
         setLoading(false);
-      } catch (error) {
+        showModal()
+      } catch (error:any) {
         console.log(error);
         notification.error({
-          message: 'Please Try again',
+          message: error.response.data.Message,
           duration: 5,
           onClose: () => {
             console.log('Notification closed');
@@ -45,8 +60,24 @@ const RegisterHarvesterModal = ({ setCreateAccount }: any) => {
     registerUser(values);
   };
 
+  useEffect(() => {
+    async function getBranches(){
+      try{
+        const response = await axios.get( URL + 'allbranchnames/')
+        setBranchData(response.data)
+      }
+      catch(error){
+        console.log(error)
+      }
+    }
+    getBranches()
+  }, [])
+
   return (
     <div>
+      <Modal title="Registration Message" open={isModalOpen} onCancel={handleCancel} footer={null}>
+        <SuccessfullRegistrationModal/>
+      </Modal>
       <section className="flex flex-col md:flex-row h-screen justify-center items-center">
         <div className="bg-white shadow-md px-8 flex items-center rounded-2xl justify-center w-full md:w-1/2 lg:w-1/3">
           <div className="w-full h-100">
@@ -112,14 +143,20 @@ const RegisterHarvesterModal = ({ setCreateAccount }: any) => {
                     name="branch_id"
                     rules={[{ required: true, message: 'Please enter branch ID!' }]}
                   >
-                    <Input />
+                    <Select>
+                      {
+                        branchData.map((branch, index) => (
+                          <Option key={index} vlaue={branch.id}>{branch.name}</Option>
+                        ))
+                      }
+                    </Select>
                   </Form.Item>
                   <Form.Item
                     label="Password"
                     name="password"
                     rules={[{ required: true, message: 'Please enter Password!' }]}
                   >
-                    <Input />
+                    <Input.Password />
                   </Form.Item>
 
                   <Form.Item
@@ -127,7 +164,7 @@ const RegisterHarvesterModal = ({ setCreateAccount }: any) => {
                     name="confirmPassword"
                     rules={[{ required: true, message: 'Please confirm Password!' }]}
                   >
-                    <Input />
+                    <Input.Password />
                   </Form.Item>
 
                   <Form.Item>
