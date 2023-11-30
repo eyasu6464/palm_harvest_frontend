@@ -1,11 +1,13 @@
 import React, { useState, useEffect } from 'react';
-import { Table, Button, Space, Dropdown, Menu, Input, Modal } from 'antd';
+import { Table, Button, Space, Dropdown, Menu, Input, Modal, notification } from 'antd';
 import { DownOutlined, MoreOutlined, EditOutlined, CloseOutlined, PlusOutlined } from '@ant-design/icons';
 import axios from 'axios'
 import { URL } from '../redux/ActionTypes';
 import { getCookie } from 'typescript-cookie'
 import RegisterHarvesterModal from '../components/RegisterHarvesterModal';
 import InactiveUsersTable from '../components/tables/InactiveUsersTable';
+import { useSelector, useDispatch } from 'react-redux';
+import { add_user_list } from '../redux/Actions';
 
 interface User {
   id: number;
@@ -17,12 +19,47 @@ interface Props {
   data: User[];
 }
 
+interface PalmUser {
+  id: number;
+  username: string;
+  email: string;
+  first_name: string;
+  last_name: string;
+  is_active: boolean;
+}
+
+interface UserData {
+  palmuser: PalmUser;
+  branch: number;
+  user_type: string;
+  address: string;
+}
+
 const Users = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [searchText, setSearchText] = useState('');
   const [searchedColumn, setSearchedColumn] = useState<string | undefined>();
   const [data, setData] = useState<any[]>([])
+  const dispatch = useDispatch()
+  const userList:UserData[] = useSelector((state:any) => state.userList);
+  const activeUsers:UserData[] = userList.filter((user:any) => user.palmuser.is_active)
+  const inactiveUsers:UserData[] = userList.filter((user) => !user.palmuser.is_active);
   const userAccessKey = getCookie('userAccessKey')
+  async function getUsers(){
+    try{
+      const response = await axios.get( URL + 'users', {
+        headers: {
+          Authorization: `Bearer ${userAccessKey}`,
+          'Content-Type': 'application/json',
+        },
+      })
+      setData(response.data)
+      dispatch(add_user_list(response.data))
+    }
+    catch(error){
+      console.log(error)
+    }
+  }
   async function deactivateAccount(id:any){
     try{
       const response = await axios.get(URL + `deactivateaccount/${id}/`,{
@@ -32,9 +69,24 @@ const Users = () => {
           },
         });
       console.log(response.data);
+      getUsers();
+      notification.success({
+        message: 'Account Deactivated Successfully',
+        duration: 5,
+        onClose: () => {
+          console.log('Notification closed');
+        },
+      });
     }
     catch(error){
       console.log(error)
+      notification.error({
+        message: 'Please Try again!',
+        duration: 5,
+        onClose: () => {
+          console.log('Notification closed');
+        },
+      });
     }
   }
   const showModal = () => {
@@ -49,7 +101,7 @@ const Users = () => {
     setIsModalOpen(false);
   };
 
-  const extractedData = data.map(item => ({
+  const extractedData = activeUsers.map(item => ({
     id: item.palmuser.id,
     fullName: item.palmuser.first_name + " " + item.palmuser.last_name,
     email: item.palmuser.email,
@@ -151,23 +203,12 @@ const Users = () => {
       ),
     },
   ];
+  const paginationConfig = {
+    pageSize: 5,
+  };
 
   useEffect(() => {
-    async function getUsers(userAccessKey:any){
-      try{
-        const response = await axios.get( URL + 'users', {
-          headers: {
-            Authorization: `Bearer ${userAccessKey}`,
-            'Content-Type': 'application/json',
-          },
-        })
-        setData(response.data)
-      }
-      catch(error){
-        console.log(error)
-      }
-    }
-    getUsers(getCookie("userAccessKey"))
+    getUsers()
   }, [])
   return (
     <div className='m-8'>
@@ -175,9 +216,11 @@ const Users = () => {
         dataSource={extractedData}
         columns={columns}
         onChange={(pagination, filters, sorter) => console.log(pagination, filters, sorter)}
-        scroll={{ x: true }}
+        scroll={{ x: true}}
+        pagination={paginationConfig}
+        title={() => <p className=' font-bold text-lg text-gray-600 '>Active Users List</p>}
       />
-      <InactiveUsersTable/>
+      <InactiveUsersTable inactiveUsers={inactiveUsers} getUsers={getUsers}/>
     </div>
   );
 };

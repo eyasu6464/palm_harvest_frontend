@@ -1,19 +1,37 @@
-import React, { useState, useEffect } from 'react';
-import { Table, Button, Space, Dropdown, Menu, Input } from 'antd';
+import React, { useState } from 'react';
+import { Table, Space, Dropdown, Menu, Input, notification } from 'antd';
 import { DownOutlined, MoreOutlined, CloseOutlined, EditOutlined } from '@ant-design/icons';
 import axios from 'axios';
 import { URL } from '../../redux/ActionTypes';
 import { getCookie } from 'typescript-cookie';
 
-interface UserData {
+interface User {
   userid: number;
+  fullName: string;
   username: string;
-  firstname: string;
-  lastname: string;
 }
 
-const InactiveUsersTable: React.FC = () => {
-  const [data, setData] = useState<UserData[]>([]);
+interface PalmUser {
+  id: number;
+  username: string;
+  email: string;
+  first_name: string;
+  last_name: string;
+  is_active: boolean;
+}
+
+interface UserData {
+  palmuser: PalmUser;
+  branch: number;
+  user_type: string;
+  address: string;
+}
+interface InactiveUsersTableProps {
+  inactiveUsers: UserData[];
+  getUsers: () => Promise<void>;
+}
+
+const InactiveUsersTable: React.FC<InactiveUsersTableProps>  = ({inactiveUsers,getUsers}) => {
   const [searchText, setSearchText] = useState('');
   const [searchedColumn, setSearchedColumn] = useState<string | undefined>();
   const userAccessKey = getCookie('userAccessKey');
@@ -27,29 +45,31 @@ const InactiveUsersTable: React.FC = () => {
           },
         });
       console.log(response.data);
+      getUsers();
+      notification.success({
+        message: 'Account Activated Successfully',
+        duration: 5,
+        onClose: () => {
+          console.log('Notification closed');
+        },
+      });
     }
     catch(error){
       console.log(error)
+      notification.error({
+        message: 'Please Try Again!',
+        duration: 5,
+        onClose: () => {
+          console.log('Notification closed');
+        },
+      });
     }
   }
-
-  useEffect(() => {
-    async function getUsers(userAccessKey: any) {
-      try {
-        const response = await axios.get(URL + 'inactiveusers/', {
-          headers: {
-            Authorization: `Bearer ${userAccessKey}`,
-            'Content-Type': 'application/json',
-          },
-        });
-        setData(response.data);
-      } catch (error) {
-        console.log(error);
-      }
-    }
-    getUsers(getCookie('userAccessKey'));
-  }, []);
-
+  const extractedData = inactiveUsers.map((item:any) => ({
+    userid: item.palmuser.id,
+    fullName: item.palmuser.first_name + " " + item.palmuser.last_name,
+    username: item.palmuser.username,
+  }));
   const handleSearch = (selectedKeys: React.Key[], confirm: () => void, dataIndex: string) => {
     confirm();
     setSearchText(selectedKeys[0] as string);
@@ -88,29 +108,29 @@ const InactiveUsersTable: React.FC = () => {
 
   const columns = [
     {
-      title: 'User ID',
+      title: 'ID',
       dataIndex: 'userid',
       key: 'userid',
-      sorter: (a: UserData, b: UserData) => a.userid - b.userid,
+      sorter: (a: User, b: User) => a.userid - b.userid,
     },
     {
       title: 'Full Name',
-      dataIndex: 'firstname',
+      dataIndex: 'fullName',
       key: 'fullname',
-      ...getColumnSearchProps('fullname'),
-      sorter: (a: UserData, b: UserData) => (a.firstname + ' ' + a.lastname).localeCompare(b.firstname + ' ' + b.lastname),
+      ...getColumnSearchProps('fullName'),
+      sorter: (a: User, b: User) => (a.fullName).localeCompare(b.fullName),
     },
     {
       title: 'Username',
       dataIndex: 'username',
       key: 'username',
       ...getColumnSearchProps('username'),
-      sorter: (a: UserData, b: UserData) => a.username.localeCompare(b.username),
+      sorter: (a: User, b: User) => a.username.localeCompare(b.username),
     },
     {
       title: 'Actions',
       key: 'actions',
-      render: (text: string, record: UserData) => (
+      render: (text: string, record: User) => (
         <Space size="middle">
           <Dropdown
             overlay={
@@ -138,14 +158,18 @@ const InactiveUsersTable: React.FC = () => {
       ),
     },
   ];
+  const paginationConfig = {
+    pageSize: 5,
+  };
 
   return (
-    <div className="m-8">
+    <div className="">
       <Table
-        dataSource={data}
+        dataSource={extractedData}
         columns={columns}
         onChange={(pagination, filters, sorter) => console.log(pagination, filters, sorter)}
-        scroll={{ x: true }}
+        scroll={{ x: true}}
+        pagination={paginationConfig}
         title={() => <p className=' font-bold text-lg text-gray-600 '>Inactive Users List</p>}
       />
     </div>
