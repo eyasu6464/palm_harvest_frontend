@@ -1,10 +1,11 @@
 import React, { useState, useEffect } from 'react';
-import { Table, Button, Space, Dropdown, Menu, Input, Modal } from 'antd';
-import { DownOutlined, MoreOutlined, EditOutlined, CloseOutlined, PlusOutlined } from '@ant-design/icons';
+import { Table, Button, Space, Dropdown, Menu, Input, Modal, Popconfirm, notification } from 'antd';
+import { DownOutlined, MoreOutlined, EditOutlined, CloseOutlined, PlusOutlined, ReloadOutlined  } from '@ant-design/icons';
 import axios from 'axios'
 import { URL } from '../redux/ActionTypes';
 import { getCookie } from 'typescript-cookie'
 import RegisterBranchModal from '../components/RegisterBranchModal';
+import EditBranchesModal from '../components/EditBranchesModal';
 
 interface Branch {
   branchid: number;
@@ -18,9 +19,11 @@ interface Props {
 
 const Branches = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [searchText, setSearchText] = useState('');
   const [searchedColumn, setSearchedColumn] = useState<string | undefined>();
   const [data, setData] = useState<Branch[]>([]);
+  const [selectedBranchId, setSelectedBranchId] = useState<number | null>(null);
   const userAccessKey = getCookie("userAccessKey")
 
   async function getBranches() {
@@ -36,6 +39,35 @@ const Branches = () => {
       console.log(error);
     }
   }
+  const handleDelete = async (branchId: number) => {
+    try {
+      const response = await axios.delete(`${URL}deletebranch/${branchId}/`, {
+                        headers: {
+                          Authorization: `Bearer ${userAccessKey}`,
+                          'Content-Type': 'application/json',
+                        },
+                      });
+
+      notification.success({
+        message: response.data.Message,
+        duration: 5,
+        onClose: () => {
+          console.log('Notification closed');
+        },
+      });
+
+      getBranches();
+    } catch (error:any) {
+      console.error('Error deleting branch:', error);
+      notification.error({
+        message: error.response.data.Message,
+        duration: 5,
+        onClose: () => {
+          console.log('Notification closed');
+        },
+      });
+    }
+  };
 
   const showModal = () => {
     setIsModalOpen(true);
@@ -47,6 +79,23 @@ const Branches = () => {
 
   const handleCancel = () => {
     setIsModalOpen(false);
+  };
+
+  const showModalEdit = (branchId: number) => {
+    setSelectedBranchId(branchId);
+    setIsEditModalOpen(true);
+  };
+
+  const handleOkEdit = () => {
+    setIsEditModalOpen(false);
+  };
+
+  const handleCancelEdit = () => {
+    setIsEditModalOpen(false);
+  };
+  const handleRefresh = () => {
+    // Call the getBranches function to fetch data again
+    getBranches();
   };
 
   const handleSearch = (selectedKeys: React.Key[], confirm: () => void, dataIndex: string) => {
@@ -122,7 +171,7 @@ const Branches = () => {
           <Dropdown
             overlay={
               <Menu>
-                <Menu.Item key="edit">
+                <Menu.Item key="edit" onClick={()=>{showModalEdit(record.branchid)}}>
                   <div className='flex flex-row'>
                     <EditOutlined />
                     <p className='ml-2'>Edit</p>
@@ -131,7 +180,17 @@ const Branches = () => {
                 <Menu.Item key="deactivate">
                   <div className='flex flex-row'>
                     <CloseOutlined />
-                    <p className='ml-2'>Delete</p>
+                    <Popconfirm
+                    title="Are you sure you want to delete this branch?"
+                    onConfirm={() => handleDelete(record.branchid)}
+                    okText="Yes"
+                    cancelText="No"
+                    okButtonProps={{ style: { backgroundColor: '#ff6929', color: '#fff' } }}
+                  >
+                    <div className='flex flex-row'>
+                      <p className='ml-2'>Delete</p>
+                    </div>
+                  </Popconfirm>
                   </div>
                 </Menu.Item>
               </Menu>
@@ -162,13 +221,16 @@ const Branches = () => {
         <Modal title="Branch Registration" open={isModalOpen} onCancel={handleCancel} footer={null}>
           <RegisterBranchModal getBranches={getBranches} />
         </Modal>
+        <Modal title="Branch" open={isEditModalOpen} onCancel={handleCancelEdit} footer={null} key={selectedBranchId}>
+          <EditBranchesModal getBranches={getBranches} branchId={selectedBranchId}/>
+        </Modal>
       </div>
       <Table
         dataSource={data}
         columns={columns}
         onChange={(pagination, filters, sorter) => console.log(pagination, filters, sorter)}
         scroll={{ x: true }}
-        pagination={paginationConfig}
+        pagination={paginationConfig}        
       />
     </div>
   );
