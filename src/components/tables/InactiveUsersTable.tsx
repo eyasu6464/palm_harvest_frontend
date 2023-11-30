@@ -16,6 +16,22 @@ const InactiveUsersTable: React.FC = () => {
   const [data, setData] = useState<UserData[]>([]);
   const [searchText, setSearchText] = useState('');
   const [searchedColumn, setSearchedColumn] = useState<string | undefined>();
+  const userAccessKey = getCookie('userAccessKey');
+
+  async function activateAccount(id:any){
+    try{
+      const response = await axios.get(URL + `activateaccount/${id}/`,{
+          headers: {
+            Authorization: `Bearer ${userAccessKey}`,
+            'Content-Type': 'application/json',
+          },
+        });
+      console.log(response.data);
+    }
+    catch(error){
+      console.log(error)
+    }
+  }
 
   useEffect(() => {
     async function getUsers(userAccessKey: any) {
@@ -102,13 +118,13 @@ const InactiveUsersTable: React.FC = () => {
                 <Menu.Item key="edit">
                   <div className="flex flex-row">
                     <EditOutlined />
-                    <p className="ml-2">Edit</p>
+                    <p className='ml-2'>Edit</p>
                   </div>
                 </Menu.Item>
-                <Menu.Item key="deactivate">
+                <Menu.Item key="deactivate" onClick={()=>{ activateAccount(record.userid) }}>
                   <div className="flex flex-row">
                     <CloseOutlined />
-                    <p className="ml-2">Activate</p>
+                    <p className='ml-2'>Activate</p>
                   </div>
                 </Menu.Item>
               </Menu>
