@@ -7,7 +7,6 @@ import { getCookie } from 'typescript-cookie'
 import RegisterHarvesterModal from '../components/RegisterHarvesterModal';
 import InactiveUsersTable from '../components/tables/InactiveUsersTable';
 
-
 interface User {
   id: number;
   fullName: string;
@@ -23,6 +22,21 @@ const Users = () => {
   const [searchText, setSearchText] = useState('');
   const [searchedColumn, setSearchedColumn] = useState<string | undefined>();
   const [data, setData] = useState<any[]>([])
+  const userAccessKey = getCookie('userAccessKey')
+  async function deactivateAccount(id:any){
+    try{
+      const response = await axios.get(URL + `deactivateaccount/${id}/`,{
+          headers: {
+            Authorization: `Bearer ${userAccessKey}`,
+            'Content-Type': 'application/json',
+          },
+        });
+      console.log(response.data);
+    }
+    catch(error){
+      console.log(error)
+    }
+  }
   const showModal = () => {
     setIsModalOpen(true);
   };
@@ -120,7 +134,7 @@ const Users = () => {
                     <p className='ml-2'>Edit</p>
                   </div>
                 </Menu.Item>
-                <Menu.Item key="deactivate">
+                <Menu.Item key="deactivate" onClick={()=>{ deactivateAccount(record.id) }}>
                   <div className='flex flex-row'>
                     <CloseOutlined />
                     <p className='ml-2'>Deactivate</p>
