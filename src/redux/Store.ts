@@ -1,11 +1,12 @@
 import { combineReducers, createStore } from "redux";
 import {composeWithDevTools} from '@redux-devtools/extension';
 
-import { addUserInformationReducer } from "./Reducer";
+import { addUserInformationReducer, addUserListReducer } from "./Reducer";
 
 const reducers = combineReducers(
     {
         userInformation:addUserInformationReducer,
+        userList:addUserListReducer
     }
 );
 
