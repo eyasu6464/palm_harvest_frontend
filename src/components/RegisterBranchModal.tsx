@@ -1,11 +1,49 @@
-import { Form, Input, Button, Select } from 'antd';
+import { useState } from 'react'
+import { Form, Input, Button, Select, notification } from 'antd';
+import { URL } from '../redux/ActionTypes';
+import axios from 'axios';
+import { getCookie } from 'typescript-cookie';
 
 const { Option } = Select;
-const onFinish = (values: any) => {
-  console.log('Received form from the form: ', values);
-};
 
-const RegisterBranchModal = () => {
+const RegisterBranchModal = ({getBranches}:any) => {
+  const [loading, setLoading] = useState(false);
+  const userAccessKey = getCookie('userAccessKey')
+  async function registerBranch(values:any){
+    try{
+      const response = await axios.post(URL + 'registerbranch/', values,{
+        headers: {
+          Authorization: `Bearer ${userAccessKey}`,
+          'Content-Type': 'application/json',
+        },
+      });
+      console.log(response.data)
+      getBranches();
+      notification.success({
+        message: 'Branch Added Successfully',
+        duration: 5,
+        onClose: () => {
+          console.log('Notification closed');
+        },
+      });
+    }
+    catch(error){
+      console.log(error);
+      notification.success({
+        message: 'Please Try again',
+        duration: 5,
+        onClose: () => {
+          console.log('Notification closed');
+        },
+      });
+    }
+    setLoading(false)
+  }
+  const onFinish = (values: any) => {
+    setLoading(true)
+    console.log('Received form from the form: ', values);
+    registerBranch(values);
+  };
   return (
     <div>
       <Form
@@ -16,7 +54,7 @@ const RegisterBranchModal = () => {
       >
         <Form.Item
           label="Branch Name"
-          name="branch_name"
+          name="branchname"
           rules={[{ required: true, message: 'Please enter the branch name!' }]}
         >
           <Input />
@@ -51,17 +89,21 @@ const RegisterBranchModal = () => {
         </Form.Item>
 
         <Form.Item wrapperCol={{ offset: 8, span: 16 }}>
-          <Button
-            type="primary"
-            htmlType="submit"
-            style={{
-              backgroundColor: '#ff6929',
-              width: '180px',
-              borderColor: '#ff6929',
-            }}
-          >
+        {
+          loading?(
+          <>
+          <Button type="primary" htmlType="submit" style={{ backgroundColor: '#ff6929', width:'180px', borderColor: '#ff6929' }} loading>
+            Registering
+          </Button>
+          </>
+          ):(
+          <>
+          <Button type="primary" htmlType="submit" style={{ backgroundColor: '#ff6929', width:'180px', borderColor: '#ff6929' }}>
             Register
           </Button>
+          </>
+          )
+        }
         </Form.Item>
       </Form>
     </div>

@@ -21,6 +21,21 @@ const Branches = () => {
   const [searchText, setSearchText] = useState('');
   const [searchedColumn, setSearchedColumn] = useState<string | undefined>();
   const [data, setData] = useState<Branch[]>([]);
+  const userAccessKey = getCookie("userAccessKey")
+
+  async function getBranches() {
+    try {
+      const response = await axios.get(URL + 'branches', {
+        headers: {
+          Authorization: `Bearer ${userAccessKey}`,
+          'Content-Type': 'application/json',
+        },
+      });
+      setData(response.data);
+    } catch (error) {
+      console.log(error);
+    }
+  }
 
   const showModal = () => {
     setIsModalOpen(true);
@@ -130,22 +145,12 @@ const Branches = () => {
       ),
     },
   ];
+  const paginationConfig = {
+    pageSize: 5,
+  };
 
   useEffect(() => {
-    async function getBranches(userAccessKey: any) {
-      try {
-        const response = await axios.get(URL + 'branches', {
-          headers: {
-            Authorization: `Bearer ${userAccessKey}`,
-            'Content-Type': 'application/json',
-          },
-        });
-        setData(response.data);
-      } catch (error) {
-        console.log(error);
-      }
-    }
-    getBranches(getCookie("userAccessKey"));
+    getBranches();
   }, []);
 
   return (
@@ -155,7 +160,7 @@ const Branches = () => {
           Add Branch
         </Button>
         <Modal title="Branch Registration" open={isModalOpen} onCancel={handleCancel} footer={null}>
-          <RegisterBranchModal/>
+          <RegisterBranchModal getBranches={getBranches} />
         </Modal>
       </div>
       <Table
@@ -163,6 +168,7 @@ const Branches = () => {
         columns={columns}
         onChange={(pagination, filters, sorter) => console.log(pagination, filters, sorter)}
         scroll={{ x: true }}
+        pagination={paginationConfig}
       />
     </div>
   );
