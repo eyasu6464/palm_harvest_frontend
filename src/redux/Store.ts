@@ -1,12 +1,13 @@
 import { combineReducers, createStore } from "redux";
 import {composeWithDevTools} from '@redux-devtools/extension';
 
-import { addUserInformationReducer, addUserListReducer } from "./Reducer";
+import { addUserInformationReducer, addUserListReducer, isUserLoggedReduer } from "./Reducer";
 
 const reducers = combineReducers(
     {
         userInformation:addUserInformationReducer,
-        userList:addUserListReducer
+        userList:addUserListReducer,
+        userLogged: isUserLoggedReduer,
     }
 );
 

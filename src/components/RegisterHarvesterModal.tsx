@@ -4,6 +4,7 @@ import AumkarVertival from '../images/AumkarVertical.png';
 import axios from 'axios';
 import { URL } from '../redux/ActionTypes';
 import SuccessfullRegistrationModal from './SuccessfullRegistrationModal';
+import { Link } from 'react-router-dom';
 
 const { Option } = Select;
 
@@ -184,10 +185,11 @@ const RegisterHarvesterModal = ({ setCreateAccount }: any) => {
                         </>
                         )
                       }
-                      
-                      <Button type="primary" style={{ backgroundColor: 'white', color:'#ff6929', width:'180px', borderColor: '#ff6929', marginTop:'10px' }} onClick={()=>setCreateAccount(false)}>
-                        Cancel
-                      </Button>
+                      <Link to="/">
+                        <Button type="primary" style={{ backgroundColor: 'white', color:'#ff6929', width:'180px', borderColor: '#ff6929', marginTop:'10px' }}>
+                          Cancel
+                        </Button>
+                      </Link>
                     </div>
                   </Form.Item>
                 </Form>

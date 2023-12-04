@@ -10,6 +10,7 @@ import Users from "./Users"
 import Home from "./Home"
 import PageNotfound from "./PageNotfound"
 import { BrowserRouter, Routes, Route } from 'react-router-dom'
+import ResetPassword from "./ResetPassword"
 
 const DashboardMain = () => {
     const userType = useSelector((state:any) => state.userInformation.user_type);

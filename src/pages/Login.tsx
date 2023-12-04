@@ -7,7 +7,8 @@ import { URL } from '../redux/ActionTypes';
 import { getCookie, setCookie } from 'typescript-cookie';
 import { useDispatch } from 'react-redux';
 import { add_user_information } from '../redux/Actions';
-
+import { is_user_logged } from '../redux/Actions';
+import { Link } from 'react-router-dom';
 const Login = ({ setLogin, setCreateAccount }: any) => {
   const dispatch = useDispatch();
   const [loading, setLoading] = useState(false);
@@ -24,6 +25,7 @@ const Login = ({ setLogin, setCreateAccount }: any) => {
         });
         setCookie('userAccessKey', response.data.access, { expires: 1 });
         dispatch(add_user_information(res.data));
+        dispatch(is_user_logged(false))
         setLogin(false);
         console.log(res.data);
       } catch (error) {
@@ -102,9 +104,11 @@ const Login = ({ setLogin, setCreateAccount }: any) => {
               </div>
 
               <div className="text-right mt-2">
-                <a href="#" className="text-sm font-semibold text-gray-700 hover:text-blue-700 focus:text-blue-700">
-                  Forgot Password?
-                </a>
+                <Link to="/forgetpassword">
+                  <p className="text-sm font-semibold text-gray-700 hover:text-blue-700 focus:text-blue-700">
+                    Forgot Password?
+                  </p>
+                </Link>
               </div>
               {loading ? (
                 <Button
@@ -131,13 +135,15 @@ const Login = ({ setLogin, setCreateAccount }: any) => {
             <hr className="my-6 border-gray-300 w-full" />
             <div className="flex justify-between items-center w-full mb-8">
               <p>Don't have an account?</p>
-              <Button
-                type="text"
-                style={{ color: '#ff6929', fontWeight: 'bolder', fontSize: '16px' }}
-                onClick={() => setCreateAccount(true)}
-              >
-                Create Account
-              </Button>
+              <Link to="/register">
+                <Button
+                  type="text"
+                  style={{ color: '#ff6929', fontWeight: 'bolder', fontSize: '16px' }}
+                  onClick={() => setCreateAccount(true)}
+                >
+                  Create Account
+                </Button>
+              </Link>
             </div>
           </div>
         </div>

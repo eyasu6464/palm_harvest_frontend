@@ -2,16 +2,19 @@ import AukmarHorizontal from '../images/AumkarHorizontal.png'
 import { Dropdown, Avatar } from 'antd';
 import { LogoutOutlined, KeyOutlined, UserOutlined } from '@ant-design/icons';
 import type { MenuProps } from 'antd';
-import { useSelector } from "react-redux"
+import { useSelector, useDispatch } from "react-redux"
 import { Link, useNavigate } from 'react-router-dom'
 import { setCookie } from 'typescript-cookie'
+import { is_user_logged } from '../redux/Actions';
 
 const Navbar = () => {
     const navigate = useNavigate();
+    const dispatch = useDispatch();
     const userType = useSelector((state:any) => state.userInformation.user_type);
     const logout = () =>{
       navigate("/")
       setCookie("userAccessKey","false",{ expires: -1 });
+      dispatch(is_user_logged(true))
       window.location.reload();
     }
     const items: MenuProps['items'] = [
