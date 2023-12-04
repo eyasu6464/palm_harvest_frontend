@@ -2,7 +2,6 @@ import Navbar from "./Navbar"
 import { useSelector } from "react-redux"
 import AllImages from "./AllImages"
 import Branches from "./Branches"
-import ForgetPassword from "./ForgetPassword"
 import Images from "./Images"
 import Profile from "./Profile"
 import UploadImage from "./UploadImage"
@@ -10,7 +9,6 @@ import Users from "./Users"
 import Home from "./Home"
 import PageNotfound from "./PageNotfound"
 import { BrowserRouter, Routes, Route } from 'react-router-dom'
-import ResetPassword from "./ResetPassword"
 
 const DashboardMain = () => {
     const userType = useSelector((state:any) => state.userInformation.user_type);
@@ -21,7 +19,6 @@ const DashboardMain = () => {
         {path:'/profile', element:<Profile/>, auth:'All'},
         {path:'/uploadimage', element:<UploadImage/>, auth:'Harvester'},
         {path:'/users', element:<Users/>, auth:'Manager'},
-        {path:'/forgetpassword', element:<ForgetPassword/>, auth:'All'},
       ]
   return (
     <div>
