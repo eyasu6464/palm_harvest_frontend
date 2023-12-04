@@ -9,6 +9,7 @@ import Users from "./Users"
 import Home from "./Home"
 import PageNotfound from "./PageNotfound"
 import { BrowserRouter, Routes, Route } from 'react-router-dom'
+import ChangePassword from "./ChangePassword"
 
 const DashboardMain = () => {
     const userType = useSelector((state:any) => state.userInformation.user_type);
@@ -19,6 +20,7 @@ const DashboardMain = () => {
         {path:'/profile', element:<Profile/>, auth:'All'},
         {path:'/uploadimage', element:<UploadImage/>, auth:'Harvester'},
         {path:'/users', element:<Users/>, auth:'Manager'},
+        {path:'/changepassword', element:<ChangePassword/>, auth:'All'},
       ]
   return (
     <div>
