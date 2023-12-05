@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Table, Space, Dropdown, Menu, Input, notification } from 'antd';
+import { Table, Space, Dropdown, Menu, Input, notification, Badge } from 'antd';
 import { DownOutlined, MoreOutlined, CloseOutlined, EditOutlined } from '@ant-design/icons';
 import axios from 'axios';
 import { URL } from '../../redux/ActionTypes';
@@ -170,7 +170,11 @@ const InactiveUsersTable: React.FC<InactiveUsersTableProps>  = ({inactiveUsers,g
         onChange={(pagination, filters, sorter) => console.log(pagination, filters, sorter)}
         scroll={{ x: true}}
         pagination={paginationConfig}
-        title={() => <p className=' font-bold text-lg text-gray-600 '>Inactive Users List</p>}
+        title={() => <div>
+          <Badge count={extractedData.length} style={{ backgroundColor: 'red', marginLeft: '8px' }}>
+            <p className='font-bold text-lg text-red-500'>Inactive Users List</p>
+          </Badge>
+        </div>}
       />
     </div>
   );

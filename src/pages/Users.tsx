@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Table, Button, Space, Dropdown, Menu, Input, Modal, notification } from 'antd';
+import { Table, Button, Space, Dropdown, Menu, Input, Modal, notification, Badge  } from 'antd';
 import { DownOutlined, MoreOutlined, EditOutlined, CloseOutlined, PlusOutlined } from '@ant-design/icons';
 import axios from 'axios'
 import { URL } from '../redux/ActionTypes';
@@ -218,7 +218,13 @@ const Users = () => {
         onChange={(pagination, filters, sorter) => console.log(pagination, filters, sorter)}
         scroll={{ x: true}}
         pagination={paginationConfig}
-        title={() => <p className=' font-bold text-lg text-gray-600 '>Active Users List</p>}
+        title={() => 
+          <div>
+            <Badge count={extractedData.length} style={{ backgroundColor: '#52c41a', marginLeft: '8px' }}>
+              <p className='font-bold text-lg text-green-600'>Active Users List</p>
+            </Badge>
+          </div>
+        }
       />
       <InactiveUsersTable inactiveUsers={inactiveUsers} getUsers={getUsers}/>
     </div>
