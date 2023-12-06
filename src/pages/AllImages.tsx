@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Card, Pagination, Select, notification, Spin, DatePicker } from 'antd';
 import axios from 'axios';
-import moment from 'moment';
+import dayjs, { Dayjs } from 'dayjs';  // Import Dayjs
 import { URL } from '../redux/ActionTypes';
 import { getCookie } from 'typescript-cookie';
 
@@ -26,8 +26,8 @@ const AllImages: React.FC = () => {
   const [branchesFilter, setBranchesFilter] = useState<number | null>(null);
   const [harvesterFilter, setHarvesterFilter] = useState<number | null>(null);
   const [branchCitiesFilter, setBranchCitiesFilter] = useState<string | null>(null);
-  const [imageCreatedFilter, setImageCreatedFilter] = useState<moment.Moment | null>(null);
-  const [imageUploadedFilter, setImageUploadedFilter] = useState<moment.Moment | null>(null);
+  const [imageCreatedFilter, setImageCreatedFilter] = useState<Dayjs | null>(null); // Use Dayjs
+  const [imageUploadedFilter, setImageUploadedFilter] = useState<Dayjs | null>(null); // Use Dayjs
   const [loading, setLoading] = useState<boolean>(false);
   const userAccessKey = getCookie('userAccessKey');
 
@@ -67,10 +67,10 @@ const AllImages: React.FC = () => {
       ? image.branch_city === branchCitiesFilter
       : true;
     const imageCreatedCondition = imageCreatedFilter
-      ? moment(image.image_created).isSame(imageCreatedFilter, 'day')
+      ? dayjs(image.image_created).isSame(imageCreatedFilter, 'day') // Use dayjs
       : true;
     const imageUploadedCondition = imageUploadedFilter
-      ? moment(image.image_uploaded).isSame(imageUploadedFilter, 'day')
+      ? dayjs(image.image_uploaded).isSame(imageUploadedFilter, 'day') // Use dayjs
       : true;
 
     return (
@@ -98,16 +98,16 @@ const AllImages: React.FC = () => {
     setHarvesterFilter(value);
   };
 
-  const handleImageCreatedFilterChange = (date: moment.Moment | null) => {
-    setImageCreatedFilter(date);
-  };
-
-  const handleImageUploadedFilterChange = (date: moment.Moment | null) => {
-    setImageUploadedFilter(date);
-  };
-
   const handleBranchCitiesFilterChange = (value: string | null) => {
     setBranchCitiesFilter(value);
+  };
+
+  const handleImageCreatedFilterChange = (date: dayjs.Dayjs | null) => {
+    setImageCreatedFilter(date);
+  };
+  
+  const handleImageUploadedFilterChange = (date: dayjs.Dayjs | null) => {
+    setImageUploadedFilter(date);
   };
 
   return (
@@ -154,17 +154,13 @@ const AllImages: React.FC = () => {
 
         <DatePicker
           placeholder="Filter by Image Created"
-          onChange={(date: moment.Moment | null, dateString: string) =>
-            handleImageCreatedFilterChange(date ? moment(dateString) : null)
-          }
+          onChange={handleImageCreatedFilterChange}
           style={{ width: '100%', maxWidth: '240px', marginBottom: '8px', marginRight: '8px' }}
         />
 
         <DatePicker
           placeholder="Filter by Image Uploaded"
-          onChange={(date: moment.Moment | null, dateString: string) =>
-            handleImageUploadedFilterChange(date ? moment(dateString) : null)
-          }
+          onChange={handleImageUploadedFilterChange}
           style={{ width: '100%', maxWidth: '240px', marginBottom: '8px' }}
         />
       </div>

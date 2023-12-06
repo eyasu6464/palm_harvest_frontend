@@ -1,10 +1,9 @@
 import React, { useState, useEffect } from 'react';
-import { Table, Button, Space, Dropdown, Menu, Input, Modal, notification, Badge  } from 'antd';
-import { DownOutlined, MoreOutlined, EditOutlined, CloseOutlined, PlusOutlined } from '@ant-design/icons';
+import { Table, Space, Dropdown, Menu, Input, notification, Badge  } from 'antd';
+import { DownOutlined, MoreOutlined, EditOutlined, CloseOutlined } from '@ant-design/icons';
 import axios from 'axios'
 import { URL } from '../redux/ActionTypes';
 import { getCookie } from 'typescript-cookie'
-import RegisterHarvesterModal from '../components/RegisterHarvesterModal';
 import InactiveUsersTable from '../components/tables/InactiveUsersTable';
 import { useSelector, useDispatch } from 'react-redux';
 import { add_user_list } from '../redux/Actions';
@@ -13,10 +12,6 @@ interface User {
   id: number;
   fullName: string;
   email: string;
-}
-
-interface Props {
-  data: User[];
 }
 
 interface PalmUser {
@@ -36,7 +31,6 @@ interface UserData {
 }
 
 const Users = () => {
-  const [isModalOpen, setIsModalOpen] = useState(false);
   const [searchText, setSearchText] = useState('');
   const [searchedColumn, setSearchedColumn] = useState<string | undefined>();
   const [data, setData] = useState<any[]>([])
@@ -57,6 +51,9 @@ const Users = () => {
       dispatch(add_user_list(response.data))
     }
     catch(error){
+      console.log(searchText)
+      console.log(searchedColumn)
+      console.log(data)
       console.log(error)
     }
   }
@@ -89,17 +86,6 @@ const Users = () => {
       });
     }
   }
-  const showModal = () => {
-    setIsModalOpen(true);
-  };
-
-  const handleOk = () => {
-    setIsModalOpen(false);
-  };
-
-  const handleCancel = () => {
-    setIsModalOpen(false);
-  };
 
   const extractedData = activeUsers.map(item => ({
     id: item.palmuser.id,
@@ -175,7 +161,7 @@ const Users = () => {
     {
       title: 'Actions',
       key: 'actions',
-      render: (text: string, record: User) => (
+      render: (record: User) => (
         <Space size="middle">
           <Dropdown
             overlay={

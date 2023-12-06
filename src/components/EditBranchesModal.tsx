@@ -1,10 +1,9 @@
 import { useState, useEffect } from 'react'
-import { Form, Input, Button, Select, notification } from 'antd';
+import { Form, Input, Button, notification } from 'antd';
 import { URL } from '../redux/ActionTypes';
 import axios from 'axios';
 import { getCookie } from 'typescript-cookie';
 
-const { Option } = Select;
 
 interface Branch{
     branchid:number;

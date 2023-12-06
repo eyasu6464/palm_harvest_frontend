@@ -56,6 +56,8 @@ const InactiveUsersTable: React.FC<InactiveUsersTableProps>  = ({inactiveUsers,g
     }
     catch(error){
       console.log(error)
+      console.log(searchText)
+      console.log(searchedColumn)
       notification.error({
         message: 'Please Try Again!',
         duration: 5,
@@ -130,7 +132,7 @@ const InactiveUsersTable: React.FC<InactiveUsersTableProps>  = ({inactiveUsers,g
     {
       title: 'Actions',
       key: 'actions',
-      render: (text: string, record: User) => (
+      render: (record: User) => (
         <Space size="middle">
           <Dropdown
             overlay={

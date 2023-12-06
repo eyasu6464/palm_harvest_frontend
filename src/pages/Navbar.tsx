@@ -1,4 +1,3 @@
-import React, { useState } from 'react';
 import { Dropdown, Avatar, Menu } from 'antd';
 import { LogoutOutlined, KeyOutlined, UserOutlined } from '@ant-design/icons';
 import type { MenuProps } from 'antd';
@@ -10,7 +9,6 @@ import { is_user_logged } from '../redux/Actions';
 import AukmarHorizontal from '../images/AumkarHorizontal.png';
 
 const Navbar = () => {
-  const [isMenuOpen, setMenuOpen] = useState(false);
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const userType = useSelector((state: any) => state.userInformation.user_type);

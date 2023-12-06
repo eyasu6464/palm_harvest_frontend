@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Table, Button, Space, Dropdown, Menu, Input, Modal, Popconfirm, notification } from 'antd';
-import { DownOutlined, MoreOutlined, EditOutlined, CloseOutlined, PlusOutlined, ReloadOutlined  } from '@ant-design/icons';
+import { DownOutlined, MoreOutlined, EditOutlined, CloseOutlined, PlusOutlined  } from '@ant-design/icons';
 import axios from 'axios'
 import { URL } from '../redux/ActionTypes';
 import { getCookie } from 'typescript-cookie'
@@ -13,9 +13,6 @@ interface Branch {
   city: string;
 }
 
-interface Props {
-  data: Branch[];
-}
 
 const Branches = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -58,6 +55,8 @@ const Branches = () => {
 
       getBranches();
     } catch (error:any) {
+      console.log(searchText)
+      console.log(searchedColumn)
       console.error('Error deleting branch:', error);
       notification.error({
         message: error.response.data.Message,
@@ -73,10 +72,6 @@ const Branches = () => {
     setIsModalOpen(true);
   };
 
-  const handleOk = () => {
-    setIsModalOpen(false);
-  };
-
   const handleCancel = () => {
     setIsModalOpen(false);
   };
@@ -86,18 +81,10 @@ const Branches = () => {
     setIsEditModalOpen(true);
   };
 
-  const handleOkEdit = () => {
-    setIsEditModalOpen(false);
-  };
 
   const handleCancelEdit = () => {
     setIsEditModalOpen(false);
   };
-  const handleRefresh = () => {
-    // Call the getBranches function to fetch data again
-    getBranches();
-  };
-
   const handleSearch = (selectedKeys: React.Key[], confirm: () => void, dataIndex: string) => {
     confirm();
     setSearchText(selectedKeys[0] as string);
@@ -166,7 +153,7 @@ const Branches = () => {
     {
       title: 'Actions',
       key: 'actions',
-      render: (text: string, record: Branch) => (
+      render: (record: Branch) => (
         <Space size="middle">
           <Dropdown
             overlay={

@@ -8,7 +8,7 @@ import { Link } from 'react-router-dom';
 
 const { Option } = Select;
 
-const RegisterHarvesterModal = ({ setCreateAccount }: any) => {
+const RegisterHarvesterModal = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [loading, setLoading] = useState(false);
   const [branchData, setBranchData] = useState<any[]>([])
@@ -16,9 +16,7 @@ const RegisterHarvesterModal = ({ setCreateAccount }: any) => {
     setIsModalOpen(true);
   };
 
-  const handleOk = () => {
-    setIsModalOpen(false);
-  };
+
 
   const handleCancel = () => {
     setIsModalOpen(false);

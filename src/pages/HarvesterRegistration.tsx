@@ -1,4 +1,3 @@
-import React from 'react'
 import RegisterHarvesterModal from '../components/RegisterHarvesterModal'
 
 const HarvesterRegistration = () => {
