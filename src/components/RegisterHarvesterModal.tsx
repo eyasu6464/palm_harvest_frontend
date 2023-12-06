@@ -138,7 +138,7 @@ const RegisterHarvesterModal = () => {
                   </Form.Item>
 
                   <Form.Item
-                    label="Branch ID"
+                    label="Branch Name"
                     name="branch_id"
                     rules={[{ required: true, message: 'Please enter branch ID!' }]}
                   >

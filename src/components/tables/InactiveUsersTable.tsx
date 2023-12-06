@@ -22,28 +22,35 @@ interface PalmUser {
 
 interface UserData {
   palmuser: PalmUser;
-  branch: number;
+  branch: {
+    branchid: number;
+    branchname: string;
+    city: string;
+    address_longitude: string;
+    address_latitude: string;
+  };
   user_type: string;
   address: string;
 }
+
 interface InactiveUsersTableProps {
   inactiveUsers: UserData[];
   getUsers: () => Promise<void>;
 }
 
-const InactiveUsersTable: React.FC<InactiveUsersTableProps>  = ({inactiveUsers,getUsers}) => {
+const InactiveUsersTable: React.FC<InactiveUsersTableProps> = ({ inactiveUsers, getUsers }) => {
   const [searchText, setSearchText] = useState('');
   const [searchedColumn, setSearchedColumn] = useState<string | undefined>();
   const userAccessKey = getCookie('userAccessKey');
 
-  async function activateAccount(id:any){
-    try{
-      const response = await axios.get(URL + `activateaccount/${id}/`,{
-          headers: {
-            Authorization: `Bearer ${userAccessKey}`,
-            'Content-Type': 'application/json',
-          },
-        });
+  async function activateAccount(id: any) {
+    try {
+      const response = await axios.get(URL + `activateaccount/${id}/`, {
+        headers: {
+          Authorization: `Bearer ${userAccessKey}`,
+          'Content-Type': 'application/json',
+        },
+      });
       console.log(response.data);
       getUsers();
       notification.success({
@@ -53,11 +60,10 @@ const InactiveUsersTable: React.FC<InactiveUsersTableProps>  = ({inactiveUsers,g
           console.log('Notification closed');
         },
       });
-    }
-    catch(error){
-      console.log(error)
-      console.log(searchText)
-      console.log(searchedColumn)
+    } catch (error) {
+      console.log(error);
+      console.log(searchText);
+      console.log(searchedColumn);
       notification.error({
         message: 'Please Try Again!',
         duration: 5,
@@ -67,11 +73,16 @@ const InactiveUsersTable: React.FC<InactiveUsersTableProps>  = ({inactiveUsers,g
       });
     }
   }
-  const extractedData = inactiveUsers.map((item:any) => ({
-    userid: item.palmuser.id,
-    fullName: item.palmuser.first_name + " " + item.palmuser.last_name,
+
+  const extractedData = inactiveUsers.map((item) => ({
+    id: item.palmuser.id,
+    fullName: item.palmuser.first_name + ' ' + item.palmuser.last_name,
     username: item.palmuser.username,
+    branchName: item.branch.branchname,
+    userType: item.user_type,
+    isActive: item.palmuser.is_active,
   }));
+
   const handleSearch = (selectedKeys: React.Key[], confirm: () => void, dataIndex: string) => {
     confirm();
     setSearchText(selectedKeys[0] as string);
@@ -111,28 +122,48 @@ const InactiveUsersTable: React.FC<InactiveUsersTableProps>  = ({inactiveUsers,g
   const columns = [
     {
       title: 'ID',
-      dataIndex: 'userid',
-      key: 'userid',
-      sorter: (a: User, b: User) => a.userid - b.userid,
+      dataIndex: 'id',
+      key: 'id',
+      sorter: (a: any, b: any) => a.id - b.id,
     },
     {
       title: 'Full Name',
       dataIndex: 'fullName',
-      key: 'fullname',
+      key: 'fullName',
       ...getColumnSearchProps('fullName'),
-      sorter: (a: User, b: User) => (a.fullName).localeCompare(b.fullName),
+      sorter: (a: any, b: any) => a.fullName.localeCompare(b.fullName),
     },
     {
       title: 'Username',
       dataIndex: 'username',
       key: 'username',
       ...getColumnSearchProps('username'),
-      sorter: (a: User, b: User) => a.username.localeCompare(b.username),
+      sorter: (a: any, b: any) => a.username.localeCompare(b.username),
+    },
+    {
+      title: 'Branch Name',
+      dataIndex: 'branchName',
+      key: 'branchName',
+      ...getColumnSearchProps('branchName'),
+    },
+    {
+      title: 'User Type',
+      dataIndex: 'userType',
+      key: 'userType',
+      ...getColumnSearchProps('userType'),
+    },  
+    {
+      title: 'Status',
+      dataIndex: 'palmuser.is_active',
+      key: 'palmuser.is_active',
+      render: (isActive: boolean) => (
+        <Badge status={isActive ? 'success' : 'error'} text={isActive ? 'Active' : 'Inactive'} />
+      ),
     },
     {
       title: 'Actions',
       key: 'actions',
-      render: (record: User) => (
+      render: (record: any) => (
         <Space size="middle">
           <Dropdown
             overlay={
@@ -143,7 +174,7 @@ const InactiveUsersTable: React.FC<InactiveUsersTableProps>  = ({inactiveUsers,g
                     <p className='ml-2'>Edit</p>
                   </div>
                 </Menu.Item>
-                <Menu.Item key="deactivate" onClick={()=>{ activateAccount(record.userid) }}>
+                <Menu.Item key="activate" onClick={() => { activateAccount(record.palmuser.id) }}>
                   <div className="flex flex-row">
                     <CloseOutlined />
                     <p className='ml-2'>Activate</p>
@@ -170,7 +201,7 @@ const InactiveUsersTable: React.FC<InactiveUsersTableProps>  = ({inactiveUsers,g
         dataSource={extractedData}
         columns={columns}
         onChange={(pagination, filters, sorter) => console.log(pagination, filters, sorter)}
-        scroll={{ x: true}}
+        scroll={{ x: true }}
         pagination={paginationConfig}
         title={() => <div>
           <Badge count={extractedData.length} style={{ backgroundColor: 'red', marginLeft: '8px' }}>
