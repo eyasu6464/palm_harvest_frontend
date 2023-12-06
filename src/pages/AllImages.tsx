@@ -4,6 +4,8 @@ import axios from 'axios';
 import dayjs, { Dayjs } from 'dayjs';  // Import Dayjs
 import { URL } from '../redux/ActionTypes';
 import { getCookie } from 'typescript-cookie';
+import { Link } from 'react-router-dom';
+
 
 const { Option } = Select;
 
@@ -170,10 +172,12 @@ const AllImages: React.FC = () => {
           {filteredImages
             .slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage)
             .map((image) => (
-              <Card key={image.imageid} cover={<img alt="example" src={"https://plus.unsplash.com/premium_photo-1677003649685-a9ff56182dbd?w=500&auto=format&fit=crop&q=60&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8NXx8cGFsbSUyMGltYWdlc3xlbnwwfHwwfHx8MA%3D%3D"} />}>
-                <p>{image.harvester_fullname}</p>
-                <p>{`${image.branch_name}, ${image.branch_city}`}</p>
-              </Card>
+              <Link to={`/image/${image.imageid}`} key={image.imageid}>
+                <Card key={image.imageid} cover={<img alt="example" src={"https://plus.unsplash.com/premium_photo-1677003649685-a9ff56182dbd?w=500&auto=format&fit=crop&q=60&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8NXx8cGFsbSUyMGltYWdlc3xlbnwwfHwwfHx8MA%3D%3D"} />}>
+                  <p>{`Image Created: ${image.image_created}`}</p>
+                  <p>{`Image Uploaded: ${image.image_uploaded}`}</p>
+                </Card>
+              </Link>
             ))}
         </div>
       </Spin>

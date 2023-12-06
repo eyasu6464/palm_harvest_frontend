@@ -8,12 +8,6 @@ import InactiveUsersTable from '../components/tables/InactiveUsersTable';
 import { useSelector, useDispatch } from 'react-redux';
 import { add_user_list } from '../redux/Actions';
 
-interface User {
-  id: number;
-  fullName: string;
-  email: string;
-}
-
 interface PalmUser {
   id: number;
   username: string;

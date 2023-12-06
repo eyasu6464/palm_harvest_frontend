@@ -5,12 +5,6 @@ import axios from 'axios';
 import { URL } from '../../redux/ActionTypes';
 import { getCookie } from 'typescript-cookie';
 
-interface User {
-  userid: number;
-  fullName: string;
-  username: string;
-}
-
 interface PalmUser {
   id: number;
   username: string;

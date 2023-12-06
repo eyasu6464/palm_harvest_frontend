@@ -2,11 +2,11 @@ import Navbar from "./Navbar"
 import { useSelector } from "react-redux"
 import AllImages from "./AllImages"
 import Branches from "./Branches"
-import Images from "./Images"
 import Profile from "./Profile"
 import UploadImage from "./UploadImage"
 import Users from "./Users"
 import Home from "./Home"
+import ImageDetailed from "./ImageDetailed"
 import PageNotfound from "./PageNotfound"
 import { BrowserRouter, Routes, Route } from 'react-router-dom'
 import ChangePassword from "./ChangePassword"
@@ -16,7 +16,7 @@ const DashboardMain = () => {
     const Main = [
         {path:'/allimages', element:<AllImages/>, auth:"Manager"},
         {path:'/branches', element:<Branches/>, auth:'Manager'},
-        {path:'/images', element:<Images/>, auth:'Harvester'},
+        {path:'/image/:id', element:<ImageDetailed/>, auth:'Manager'},
         {path:'/profile', element:<Profile/>, auth:'All'},
         {path:'/uploadimage', element:<UploadImage/>, auth:'Harvester'},
         {path:'/users', element:<Users/>, auth:'Manager'},
