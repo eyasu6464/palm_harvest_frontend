@@ -5,6 +5,7 @@ import axios from 'axios';
 import { getCookie } from 'typescript-cookie';
 import { URL } from '../redux/ActionTypes';
 import PalmDetailsTable from '../components/tables/PalmDetailsTable';
+import ImageEditor from './ImageEditor';
 
 interface ImageDetails {
   imageid: number;
@@ -91,6 +92,7 @@ const ImageDetailed = () => {
           </div>
         </div>
         <PalmDetailsTable palmdetails={imageDetails.palmdetails}/>
+        <ImageEditor/>
       </Card>
     </div>
   );

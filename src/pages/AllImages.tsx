@@ -6,7 +6,6 @@ import { URL } from '../redux/ActionTypes';
 import { getCookie } from 'typescript-cookie';
 import { Link } from 'react-router-dom';
 
-
 const { Option } = Select;
 
 interface Image {
@@ -19,6 +18,18 @@ interface Image {
   branch_id: number;
   branch_name: string;
   branch_city: string;
+  palmdetails: [{
+    palmid: number;
+    quality: string;
+    real: boolean;
+    predicted: boolean;
+    x1_coordinate: string;
+    y1_coordinate: string;
+    x2_coordinate: string;
+    y2_coordinate: string;
+    palm_image_uploaded: string;
+    imageid: number;
+  }]
 }
 
 const AllImages: React.FC = () => {
@@ -28,8 +39,9 @@ const AllImages: React.FC = () => {
   const [branchesFilter, setBranchesFilter] = useState<number | null>(null);
   const [harvesterFilter, setHarvesterFilter] = useState<number | null>(null);
   const [branchCitiesFilter, setBranchCitiesFilter] = useState<string | null>(null);
-  const [imageCreatedFilter, setImageCreatedFilter] = useState<Dayjs | null>(null); // Use Dayjs
-  const [imageUploadedFilter, setImageUploadedFilter] = useState<Dayjs | null>(null); // Use Dayjs
+  const [imageCreatedFilter, setImageCreatedFilter] = useState<Dayjs | null>(null);
+  const [imageUploadedFilter, setImageUploadedFilter] = useState<Dayjs | null>(null);
+  const [labelFilter, setLabelFilter] = useState<string | null>(null); // New filter for AI/Human Labeled
   const [loading, setLoading] = useState<boolean>(false);
   const userAccessKey = getCookie('userAccessKey');
 
@@ -37,6 +49,9 @@ const AllImages: React.FC = () => {
     try {
       setLoading(true);
       const response = await axios.get(`${URL}images/`, {
+        params: {
+          label: labelFilter, // Add label filter to the API request
+        },
         headers: {
           Authorization: `Bearer ${userAccessKey}`,
           'Content-Type': 'application/json',
@@ -69,10 +84,14 @@ const AllImages: React.FC = () => {
       ? image.branch_city === branchCitiesFilter
       : true;
     const imageCreatedCondition = imageCreatedFilter
-      ? dayjs(image.image_created).isSame(imageCreatedFilter, 'day') // Use dayjs
+      ? dayjs(image.image_created).isSame(imageCreatedFilter, 'day')
       : true;
     const imageUploadedCondition = imageUploadedFilter
-      ? dayjs(image.image_uploaded).isSame(imageUploadedFilter, 'day') // Use dayjs
+      ? dayjs(image.image_uploaded).isSame(imageUploadedFilter, 'day')
+      : true;
+
+    const labelCondition = labelFilter
+      ? image.palmdetails.some((palm) => palm.real === (labelFilter === 'AI Labeled'))
       : true;
 
     return (
@@ -80,7 +99,8 @@ const AllImages: React.FC = () => {
       harvesterCondition &&
       branchCityCondition &&
       imageCreatedCondition &&
-      imageUploadedCondition
+      imageUploadedCondition &&
+      labelCondition
     );
   });
 
@@ -107,7 +127,7 @@ const AllImages: React.FC = () => {
   const handleImageCreatedFilterChange = (date: dayjs.Dayjs | null) => {
     setImageCreatedFilter(date);
   };
-  
+
   const handleImageUploadedFilterChange = (date: dayjs.Dayjs | null) => {
     setImageUploadedFilter(date);
   };
@@ -163,8 +183,18 @@ const AllImages: React.FC = () => {
         <DatePicker
           placeholder="Filter by Image Uploaded"
           onChange={handleImageUploadedFilterChange}
-          style={{ width: '100%', maxWidth: '240px', marginBottom: '8px' }}
+          style={{ width: '100%', maxWidth: '240px', marginBottom: '8px', marginRight:'8px' }}
         />
+
+        <Select
+          placeholder="Filter by Label"
+          style={{ width: '100%', maxWidth: '200px', marginBottom: '8px', marginRight: '8px' }}
+          onChange={(value) => setLabelFilter(value)}
+        >
+          <Option value={null}>All Labels</Option>
+          <Option value="AI Labeled">AI Labeled</Option>
+          <Option value="Human Labeled">Human Labeled</Option>
+        </Select>
       </div>
 
       <Spin spinning={loading}>
