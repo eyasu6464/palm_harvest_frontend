@@ -4,6 +4,7 @@ import { useParams } from 'react-router-dom';
 import axios from 'axios';
 import { getCookie } from 'typescript-cookie';
 import { URL } from '../redux/ActionTypes';
+import PalmDetailsTable from '../components/tables/PalmDetailsTable';
 
 interface ImageDetails {
   imageid: number;
@@ -89,9 +90,7 @@ const ImageDetailed = () => {
             </Descriptions>
           </div>
         </div>
-        <div className='w-full border rounded-md mt-2 ' style={{ backgroundColor: '#ff6929' }}>
-          <h3 className='p-2 text-xl font-semibold text-white'>Palm Details</h3>
-        </div>
+        <PalmDetailsTable palmdetails={imageDetails.palmdetails}/>
       </Card>
     </div>
   );
