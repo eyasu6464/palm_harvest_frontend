@@ -2,23 +2,48 @@ import { useEffect, useState } from 'react';
 import { Descriptions, Spin, notification, Card } from 'antd';
 import { useParams } from 'react-router-dom';
 import axios from 'axios';
+import { getCookie } from 'typescript-cookie';
+import { URL } from '../redux/ActionTypes';
 
 interface ImageDetails {
   imageid: number;
-  quality: string;
-  realOrPredicted: string;
-  palmImageUploaded: string;
+  image_path: string;
+  image_created: string;
+  image_uploaded: string;
+  harvester_id: number;
+  harvester_fullname: string;
+  branch_id: string;
+  branch_name: string;
+  branch_city: string;
+  palmdetails: [{
+    palmid: number;
+    quality: string;
+    real: string;
+    predicted: string;
+    x1_coordinate: string;
+    y1_coordinate: string;
+    x2_coordinate: string;
+    y2_coordinate: string;
+    palm_image_uploaded: string;
+    imageid: number;
+  }]
 }
 
 const ImageDetailed = () => {
   const { id } = useParams<{ id: string }>();
   const [imageDetails, setImageDetails] = useState<ImageDetails | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
+  const userAccessKey = getCookie("userAccessKey");
 
   useEffect(() => {
     const fetchImageDetails = async () => {
       try {
-        const response = await axios.get(`/api/images/${id}`); // Update with your API endpoint
+        const response = await axios.get(`${URL}image/${id}`, {
+          headers: {
+            Authorization: `Bearer ${userAccessKey}`,
+            'Content-Type': 'application/json',
+          },
+        });
         setImageDetails(response.data);
       } catch (error: any) {
         console.error('Error fetching image details:', error);
@@ -46,15 +71,27 @@ const ImageDetailed = () => {
   return (
     <div className="my-8 mx-4">
       <Card style={{ width: '100%' }}>
-        <div className="zoom-container">
-            <img alt="example" src={"https://plus.unsplash.com/premium_photo-1677003649685-a9ff56182dbd?w=500&auto=format&fit=crop&q=60&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8NXx8cGFsbSUyMGltYWdlc3xlbnwwfHwwfHx8MA%3D%3D"} className="zoom-image" />
+        <div className='flex flex-col md:flex-row'>
+          <div className="md:w-1/3 zoom-container bg-ff6929">
+            <img
+              alt="example"
+              src={"https://plus.unsplash.com/premium_photo-1677003649685-a9ff56182dbd?w=500&auto=format&fit=crop&q=60&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8NXx8cGFsbSUyMGltYWdlc3xlbnwwfHwwfHx8MA%3D%3D"}
+              className="max-w-full"
+            />
+          </div>
+          <div className='md:w-2/3 mx-4'>
+            <Descriptions bordered column={1} style={{ marginTop: '16px' }}>
+              <Descriptions.Item label="Image ID">{imageDetails.imageid}</Descriptions.Item>
+              <Descriptions.Item label="Harvester Full Name">{imageDetails.harvester_fullname}</Descriptions.Item>
+              <Descriptions.Item label="Branch Name">{imageDetails.branch_name}</Descriptions.Item>
+              <Descriptions.Item label="Image Created">{imageDetails.image_created}</Descriptions.Item>
+              <Descriptions.Item label="Image Uploaded">{imageDetails.image_uploaded}</Descriptions.Item>
+            </Descriptions>
+          </div>
         </div>
-        <Descriptions bordered column={2} style={{ marginTop: '16px' }}>
-          <Descriptions.Item label="Image ID">{imageDetails.imageid}</Descriptions.Item>
-          <Descriptions.Item label="Quality">{imageDetails.quality}</Descriptions.Item>
-          <Descriptions.Item label="Real or Predicted">{imageDetails.realOrPredicted}</Descriptions.Item>
-          <Descriptions.Item label="Palm Image Uploaded">{imageDetails.palmImageUploaded}</Descriptions.Item>
-        </Descriptions>
+        <div className='w-full border rounded-md mt-2 ' style={{ backgroundColor: '#ff6929' }}>
+          <h3 className='p-2 text-xl font-semibold text-white'>Palm Details</h3>
+        </div>
       </Card>
     </div>
   );
