@@ -5,8 +5,8 @@ import { TablePaginationConfig } from 'antd/lib/table/interface';
 interface PalmDetails {
   palmid: number;
   quality: string;
-  real: string;
-  predicted: string;
+  real: boolean;
+  predicted: boolean;
   x1_coordinate: string;
   y1_coordinate: string;
   x2_coordinate: string;
@@ -41,7 +41,7 @@ const PalmDetailsTable: React.FC<PalmDetailsTableProps> = ({ palmdetails }) => {
       title: 'Quality',
       dataIndex: 'quality',
       key: 'quality',
-      filterDropdown: ({ setSelectedKeys, selectedKeys, confirm, clearFilters }: any) => (
+      filterDropdown: ({ setSelectedKeys, selectedKeys, confirm}: any) => (
         <div style={{ padding: 8 }}>
           <Input
             placeholder="Search quality"
@@ -57,7 +57,8 @@ const PalmDetailsTable: React.FC<PalmDetailsTableProps> = ({ palmdetails }) => {
       title: 'Real/Predicted',
       dataIndex: 'real',
       key: 'real',
-      filterDropdown: ({ setSelectedKeys, selectedKeys, confirm, clearFilters }: any) => (
+      render: (value: boolean) => value ? 'True' : 'False',
+      filterDropdown: ({ setSelectedKeys, selectedKeys, confirm}: any) => (
         <div style={{ padding: 8 }}>
           <Input
             placeholder="Search Real/Predicted"
@@ -70,7 +71,7 @@ const PalmDetailsTable: React.FC<PalmDetailsTableProps> = ({ palmdetails }) => {
           />
         </div>
       ),
-      onFilter: (value: any, record: PalmDetails) => record.real.toLowerCase().includes(value.toLowerCase()),
+      onFilter: (value: any, record: PalmDetails) => String(record.real).toLowerCase() === value.toLowerCase(),
     },
     {
       title: 'X1 Coordinate',

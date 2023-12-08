@@ -20,8 +20,8 @@ interface ImageDetails {
   palmdetails: [{
     palmid: number;
     quality: string;
-    real: string;
-    predicted: string;
+    real: boolean;
+    predicted: boolean;
     x1_coordinate: string;
     y1_coordinate: string;
     x2_coordinate: string;
