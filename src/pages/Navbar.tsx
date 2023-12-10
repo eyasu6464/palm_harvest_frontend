@@ -1,7 +1,7 @@
 import { Dropdown, Avatar, Menu } from 'antd';
 import { LogoutOutlined, KeyOutlined, UserOutlined } from '@ant-design/icons';
 import type { MenuProps } from 'antd';
-import { useSelector, useDispatch } from 'react-redux';
+import { useDispatch } from 'react-redux';
 import { Link, useNavigate } from 'react-router-dom';
 import { setCookie } from 'typescript-cookie';
 import { is_user_logged } from '../redux/Actions';
@@ -11,7 +11,7 @@ import AukmarHorizontal from '../images/AumkarHorizontal.png';
 const Navbar = () => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
-  const userType = useSelector((state: any) => state.userInformation.user_type);
+  // const userType = useSelector((state: any) => state.userInformation.user_type);
 
   const logout = () => {
     navigate('/');
@@ -54,10 +54,9 @@ const Navbar = () => {
     { title: 'Users', path: '/users', auth: 'Manager' },
     { title: 'Branches', path: '/branches', auth: 'Manager' },
     { title: 'Images', path: '/allimages', auth: 'Manager' },
-    { title: 'MyImages', path: '/images', gap: 'false', auth: 'Harvester' },
   ];
 
-  const MainLists = Menus.filter((items: any) => items.auth === userType);
+  // const MainLists = Menus.filter((items: any) => items.auth === userType);
 
   const dropdownItems = (
     <Menu>
@@ -82,7 +81,7 @@ const Navbar = () => {
             </Link>
             <div className="items-center hidden w-full md:flex md:w-auto md:order-1 ml-24" id="navbar-user">
               <ul className="flex flex-col font-medium p-4 md:p-0 mt-4 border border-white rounded-lg bg-white md:space-x-8 rtl:space-x-reverse md:flex-row md:mt-0 md:border-0 md:bg-white">
-                {MainLists.map((menu, index) => (
+                {Menus.map((menu, index) => (
                   <Link to={menu.path} key={index}>
                     <li>
                       <a

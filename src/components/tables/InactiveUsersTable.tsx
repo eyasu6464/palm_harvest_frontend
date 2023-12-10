@@ -168,7 +168,7 @@ const InactiveUsersTable: React.FC<InactiveUsersTableProps> = ({ inactiveUsers, 
                     <p className='ml-2'>Edit</p>
                   </div>
                 </Menu.Item>
-                <Menu.Item key="activate" onClick={() => { activateAccount(record.palmuser.id) }}>
+                <Menu.Item key="activate" onClick={() => { activateAccount(record.id) }}>
                   <div className="flex flex-row">
                     <CloseOutlined />
                     <p className='ml-2'>Activate</p>

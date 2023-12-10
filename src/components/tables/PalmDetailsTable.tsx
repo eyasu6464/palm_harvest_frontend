@@ -57,7 +57,7 @@ const PalmDetailsTable: React.FC<PalmDetailsTableProps> = ({ palmdetails }) => {
       title: 'Real/Predicted',
       dataIndex: 'real',
       key: 'real',
-      render: (value: boolean) => value ? 'True' : 'False',
+      render: (value: boolean) => value ? 'Real' : 'Predicted',
       filterDropdown: ({ setSelectedKeys, selectedKeys, confirm}: any) => (
         <div style={{ padding: 8 }}>
           <Input
