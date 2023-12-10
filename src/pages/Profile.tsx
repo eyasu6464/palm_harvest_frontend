@@ -72,7 +72,7 @@ const Profile = () => {
               email: userData.palmuser.email,
               user_type: userData.user_type,
               address: userData.address,
-              branch_id: userData.branch,
+              branch_id: userData.branch.branchid,
             }}
             labelCol={{ flex: '150px', span: 30 }}
             labelAlign="left"

@@ -203,7 +203,7 @@ const AllImages: React.FC = () => {
             .slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage)
             .map((image) => (
               <Link to={`/image/${image.imageid}`} key={image.imageid}>
-                <Card key={image.imageid} cover={<img alt="example" src={"https://plus.unsplash.com/premium_photo-1677003649685-a9ff56182dbd?w=500&auto=format&fit=crop&q=60&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8NXx8cGFsbSUyMGltYWdlc3xlbnwwfHwwfHx8MA%3D%3D"} />}>
+                <Card key={image.imageid} cover={<img alt="example" src={`https://palm.blackneb.com${image.imagepath}`} />}>
                   <p>{`Image Created: ${image.image_created}`}</p>
                   <p>{`Image Uploaded: ${image.image_uploaded}`}</p>
                 </Card>

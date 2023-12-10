@@ -9,7 +9,7 @@ import ImageEditor from './ImageEditor';
 
 interface ImageDetails {
   imageid: number;
-  image_path: string;
+  imagepath: string;
   image_created: string;
   image_uploaded: string;
   harvester_id: number;
@@ -77,7 +77,7 @@ const ImageDetailed = () => {
           <div className="md:w-1/3 zoom-container bg-ff6929">
             <img
               alt="example"
-              src={"https://plus.unsplash.com/premium_photo-1677003649685-a9ff56182dbd?w=500&auto=format&fit=crop&q=60&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8NXx8cGFsbSUyMGltYWdlc3xlbnwwfHwwfHx8MA%3D%3D"}
+              src={`https://blackneb.com${imageDetails.imagepath}`}
               className="max-w-full"
             />
           </div>
