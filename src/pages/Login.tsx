@@ -117,6 +117,7 @@ const Login = ({ setLogin, setCreateAccount }: any) => {
                   className="login-form-button"
                   style={{ backgroundColor: '#ff6929', color: 'white', width: '100%' }}
                   loading
+                  disabled
                 >
                   Loading
                 </Button>

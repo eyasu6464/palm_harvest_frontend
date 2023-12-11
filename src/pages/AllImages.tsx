@@ -61,7 +61,7 @@ const AllImages: React.FC = () => {
     } catch (error: any) {
       console.error('Error fetching images:', error);
       notification.error({
-        message: 'Failed to fetch images. Please try again!',
+        message: error.response.message,
         description: error.message || 'Unknown error',
         duration: 5,
         onClose: () => {

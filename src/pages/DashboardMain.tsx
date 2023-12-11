@@ -6,7 +6,7 @@ import Users from "./Users"
 import Home from "./Home"
 import ImageDetailed from "./ImageDetailed"
 import PageNotfound from "./PageNotfound"
-import { BrowserRouter, Routes, Route } from 'react-router-dom'
+import { Routes, Route, HashRouter } from 'react-router-dom'
 import ChangePassword from "./ChangePassword"
 
 const DashboardMain = () => {
@@ -21,7 +21,7 @@ const DashboardMain = () => {
       ]
   return (
     <div>
-        <BrowserRouter>
+        <HashRouter>
         <Navbar/>
             <Routes>
                 <Route path='/' element={<Home />} />
@@ -32,7 +32,7 @@ const DashboardMain = () => {
                 }
                 <Route path="*" element={<PageNotfound/>} />
             </Routes>
-        </BrowserRouter>
+        </HashRouter>
     </div>
   )
 }
