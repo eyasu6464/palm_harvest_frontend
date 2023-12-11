@@ -37,6 +37,25 @@ const InactiveUsersTable: React.FC<InactiveUsersTableProps> = ({ inactiveUsers, 
   const [searchedColumn, setSearchedColumn] = useState<string | undefined>();
   const userAccessKey = getCookie('userAccessKey');
 
+  async function sendEmail(id:any){
+    const values = {
+      subject:"Email Activation",
+      message:"Your Account Has Been Activated Successfully",
+      userid:id
+    }
+    try{
+      const response = await axios.post(URL + `sendemail/`,values, {
+        headers: {
+          Authorization: `Bearer ${userAccessKey}`,
+          'Content-Type': 'application/json',
+        },
+      });
+      console.log(response.data)
+    }
+    catch(error){
+      console.log(error)
+    }
+  }
   async function activateAccount(id: any) {
     try {
       const response = await axios.get(URL + `activateaccount/${id}/`, {
@@ -47,6 +66,7 @@ const InactiveUsersTable: React.FC<InactiveUsersTableProps> = ({ inactiveUsers, 
       });
       console.log(response.data);
       getUsers();
+      sendEmail(id);
       notification.success({
         message: 'Account Activated Successfully',
         duration: 5,

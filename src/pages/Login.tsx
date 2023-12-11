@@ -23,10 +23,21 @@ const Login = ({ setLogin, setCreateAccount }: any) => {
             'Content-Type': 'application/json',
           },
         });
-        setCookie('userAccessKey', response.data.access, { expires: 1 });
-        dispatch(add_user_information(res.data));
-        dispatch(is_user_logged(false))
-        setLogin(false);
+        if (res.data.user_type === "Harvester"){
+          notification.error({
+            message: 'Please use the mobile app to login!',
+            duration: 5,
+            onClose: () => {
+              console.log('Notification closed');
+            },
+          });
+        }
+        else{
+          setCookie('userAccessKey', response.data.access, { expires: 1 });
+          dispatch(add_user_information(res.data));
+          dispatch(is_user_logged(false))
+          setLogin(false);
+        }
         console.log(res.data);
       } catch (error) {
         console.log(error);

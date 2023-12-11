@@ -59,6 +59,26 @@ const Users = () => {
     }
   }
 
+  async function sendEmail(id:any){
+    const values = {
+      subject:"Email Deactivation",
+      message:"Your Account Has Been Deactivaed",
+      userid:id
+    }
+    try{
+      const response = await axios.post(URL + `sendemail/`,values, {
+        headers: {
+          Authorization: `Bearer ${userAccessKey}`,
+          'Content-Type': 'application/json',
+        },
+      });
+      console.log(response.data)
+    }
+    catch(error){
+      console.log(error)
+    }
+  }
+
   async function deactivateAccount(id: any) {
     try {
       const response = await axios.get(URL + `deactivateaccount/${id}/`, {
@@ -69,6 +89,7 @@ const Users = () => {
       });
       console.log(response.data);
       getUsers();
+      sendEmail(id)
       notification.success({
         message: 'Account Deactivated Successfully',
         duration: 5,
