@@ -5,6 +5,7 @@ import Profile from "./Profile"
 import Users from "./Users"
 import Home from "./Home"
 import ImageDetailed from "./ImageDetailed"
+import ImageEditor from "./ImageEditor"
 import PageNotfound from "./PageNotfound"
 import { Routes, Route, HashRouter } from 'react-router-dom'
 import ChangePassword from "./ChangePassword"
@@ -17,6 +18,7 @@ const DashboardMain = () => {
         {path:'/image/:id', element:<ImageDetailed/>, auth:'Manager'},
         {path:'/profile', element:<Profile/>, auth:'All'},
         {path:'/users', element:<Users/>, auth:'Manager'},
+        {path:'/imageeditor', element:<ImageEditor/>, auth:'Manager'},
         {path:'/changepassword', element:<ChangePassword/>, auth:'All'},
       ]
   return (
