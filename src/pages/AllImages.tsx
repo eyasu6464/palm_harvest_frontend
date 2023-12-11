@@ -1,10 +1,12 @@
 import React, { useState, useEffect } from 'react';
-import { Card, Pagination, Select, notification, Spin, DatePicker } from 'antd';
+import { Card, Pagination, Select, notification, Spin, DatePicker, Button, Modal } from 'antd';
+import { PlusOutlined  } from '@ant-design/icons';
 import axios from 'axios';
 import dayjs, { Dayjs } from 'dayjs';  // Import Dayjs
 import { URL } from '../redux/ActionTypes';
 import { getCookie } from 'typescript-cookie';
 import { Link } from 'react-router-dom';
+import AddNewImageModal from '../components/AddNewImageModal';
 
 const { Option } = Select;
 
@@ -43,6 +45,7 @@ const AllImages: React.FC = () => {
   const [imageUploadedFilter, setImageUploadedFilter] = useState<Dayjs | null>(null);
   const [labelFilter, setLabelFilter] = useState<string | null>(null); // New filter for AI/Human Labeled
   const [loading, setLoading] = useState<boolean>(false);
+  const [isModalOpen, setIsModalOpen] = useState(false);
   const userAccessKey = getCookie('userAccessKey');
 
   const fetchImages = async () => {
@@ -71,6 +74,14 @@ const AllImages: React.FC = () => {
     } finally {
       setLoading(false);
     }
+  };
+
+  const showModal = () => {
+    setIsModalOpen(true);
+  };
+
+  const handleCancel = () => {
+    setIsModalOpen(false);
   };
 
   useEffect(() => {
@@ -134,6 +145,14 @@ const AllImages: React.FC = () => {
 
   return (
     <div className="my-8 mx-4">
+      <div className='flex justify-center items-center my-4'>
+        <Button type="primary" icon={<PlusOutlined />} onClick={showModal} style={{ backgroundColor: '#ff6929', width:'180px', borderColor: '#ff6929' }}>
+          Add New Image
+        </Button>
+        <Modal title="New Image" open={isModalOpen} onCancel={handleCancel} footer={null}>
+          <AddNewImageModal/>
+        </Modal>
+      </div>
       <div className="mb-4 flex flex-wrap items-center justify-center">
         <Select
           placeholder="Filter by Branch"
