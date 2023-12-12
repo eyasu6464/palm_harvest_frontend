@@ -1,11 +1,10 @@
 import { useEffect, useState } from 'react';
-import { Descriptions, Spin, notification, Card } from 'antd';
-import { useParams } from 'react-router-dom';
+import { Descriptions, Spin, notification, Card, Button } from 'antd';
+import { useParams, useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import { getCookie } from 'typescript-cookie';
 import { URL } from '../redux/ActionTypes';
 import PalmDetailsTable from '../components/tables/PalmDetailsTable';
-import ImageEditor from './ImageEditor';
 
 interface ImageDetails {
   imageid: number;
@@ -36,7 +35,7 @@ const ImageDetailed = () => {
   const [imageDetails, setImageDetails] = useState<ImageDetails | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
   const userAccessKey = getCookie("userAccessKey");
-
+  const navigate = useNavigate();
   useEffect(() => {
     const fetchImageDetails = async () => {
       try {
@@ -62,6 +61,10 @@ const ImageDetailed = () => {
     fetchImageDetails();
   }, [id]);
 
+  const handleEditImage = () => {
+    navigate(`/imageeditor/${id}`)
+  };
+
   if (loading) {
     return <Spin />;
   }
@@ -80,6 +83,9 @@ const ImageDetailed = () => {
               src={`https://palm.blackneb.com${imageDetails.imagepath}`}
               className="max-w-full"
             />
+            <Button type="primary" style={{ backgroundColor: '#ff6929', color: 'white', marginTop:'5px', width: '100%' }} onClick={handleEditImage} >
+                  Edit
+            </Button>
           </div>
           <div className='md:w-2/3 mx-4'>
             <Descriptions bordered column={1} style={{ marginTop: '16px' }}>
@@ -92,7 +98,6 @@ const ImageDetailed = () => {
           </div>
         </div>
         <PalmDetailsTable palmdetails={imageDetails.palmdetails}/>
-        <ImageEditor/>
       </Card>
     </div>
   );

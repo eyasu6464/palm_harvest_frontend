@@ -1,64 +1,170 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { fabric } from 'fabric';
-import { Select, Input, Table, Button, notification, Dropdown, Menu } from 'antd';
+import { useParams } from 'react-router-dom';
+import { Select,Spin, Input, Table, Button, notification, Dropdown, Menu, Slider } from 'antd';
 import axios from 'axios';
 import { EllipsisOutlined } from '@ant-design/icons';
-
+import { getCookie } from 'typescript-cookie';
+import { URL } from '../redux/ActionTypes';
 const { Option } = Select;
+
+
+interface ImageDetails {
+  imageid: number;
+  imagepath: string;
+  image_created: string;
+  image_uploaded: string;
+  harvester_id: number;
+  harvester_fullname: string;
+  branch_id: string;
+  branch_name: string;
+  branch_city: string;
+  palmdetails: [{
+    palmid: number;
+    quality: string;
+    real: boolean;
+    predicted: boolean;
+    x1_coordinate: string;
+    y1_coordinate: string;
+    x2_coordinate: string;
+    y2_coordinate: string;
+    palm_image_uploaded: string;
+    imageid: number;
+  }]
+}
+
 
 const ImageEditor: React.FC = () => {
   const canvasRef = useRef<fabric.Canvas | null>(null);
-  const [image, setImage] = useState<string | null>(
-    'https://palm.blackneb.com/media/uploads/e9da55822ab24ff715fc4355c3455b15_eo9pp5u.jpg'
-  );
+  const { id } = useParams<{ id: string }>();
+  const [imageDetails, setImageDetails] = useState<ImageDetails | null>(null);
+  const [loading, setLoading] = useState<boolean>(true);
+  const [image, setImage] = useState<string | null>();
   const [tableData, setTableData] = useState<any[]>([]);
-  const [userAccessKey] = useState<string>('your_user_access_key'); // Replace with actual user access key
-  const URL = 'your_api_base_url'; // Replace with your actual API base URL
+  const userAccessKey = getCookie("userAccessKey");
   const [imageLoadError, setImageLoadError] = useState<boolean>(false);
+  const [rectangleWidth, setRectangleWidth] = useState<number>(100);
+  const [rectangleHeight, setRectangleHeight] = useState<number>(100);
 
   useEffect(() => {
-    if (!canvasRef.current) {
-      const canvas = new fabric.Canvas('canvas', {
-        backgroundColor: '#f0f0f0',
-      });
-
-      canvasRef.current = canvas;
-
-      if (image) {
-        fabric.Image.fromURL(image, (img) => {
-          if (img) {
-            canvasRef.current?.setBackgroundImage(
-              img,
-              canvasRef.current?.renderAll.bind(canvasRef.current)
-            );
-
-            // Set canvas dimensions based on the loaded image
-            canvasRef.current?.setDimensions({
-              width: img.width || 800, // Set a default width if img.width is not available
-              height: img.height || 600, // Set a default height if img.height is not available
-            });
-
-            // Initialize with one bounding rectangle
-            const initialRect = new fabric.Rect({
-              left: 50,
-              top: 50,
-              fill: 'transparent',
-              stroke: 'red',
-              strokeWidth: 2,
-              width: 100,
-              height: 100,
-              lockRotation: true,
-            });
-
-            canvasRef.current?.add(initialRect);
-            canvasRef.current?.renderAll();
-          } else {
-            setImageLoadError(true);
-          }
+    const initializeCanvas = async () => {
+      console.log(`image link is: ${image}`);
+      console.log('triggered')
+      if (!canvasRef.current) {
+        const canvas = new fabric.Canvas('canvas', {
+          backgroundColor: '#f0f0f0',
         });
+
+        canvasRef.current = canvas;
+
+        if (image) {
+          fabric.Image.fromURL(image, (img) => {
+            if (img) {
+              canvasRef.current?.setBackgroundImage(
+                img,
+                canvasRef.current?.renderAll.bind(canvasRef.current)
+              );
+
+              // Set canvas dimensions based on the loaded image
+              canvasRef.current?.setDimensions({
+                width: img.width || 800,
+                height: img.height || 600,
+              });
+
+              // Initialize with one bounding rectangle
+              const initialRect = new fabric.Rect({
+                left: 50,
+                top: 50,
+                fill: 'transparent',
+                stroke: 'red',
+                strokeWidth: 2,
+                width: rectangleWidth,
+                height: rectangleHeight,
+                hasControls: false,
+                hasBorders: false,
+              });
+
+              canvasRef.current?.add(initialRect);
+              canvasRef.current?.renderAll();
+
+              // Listen for object modification events
+              canvasRef.current?.on('object:modified', handleObjectModified);
+            } else {
+              setImageLoadError(true);
+            }
+          });
+        }
+      }
+    };
+    const fetchImageDetails = async () => {
+      try {
+        const response = await axios.get(`${URL}image/${id}`, {
+          headers: {
+            Authorization: `Bearer ${userAccessKey}`,
+            'Content-Type': 'application/json',
+          },
+        });
+        setImageDetails(response.data);
+        setImage(`https://palm.blackneb.com${response.data.imagepath}`);
+        console.log(`https://palm.blackneb.com${response.data.imagepath}`);
+        if(image !== undefined){
+          initializeCanvas();
+        }
+      } catch (error: any) {
+        console.error('Error fetching image details:', error);
+        notification.error({
+          message: 'Failed to fetch image details. Please try again!',
+          description: error.message || 'Unknown error',
+          duration: 5,
+        });
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchImageDetails();
+  }, [id, image, rectangleWidth, rectangleHeight]);
+
+  const handleObjectModified = () => {
+    if (canvasRef.current) {
+      const objects = canvasRef.current.getObjects();
+      if (objects.length > 0) {
+        const rect = objects[0] as fabric.Rect;
+
+        if (rect) {
+          const newWidth = rect.width || 0;
+          const newHeight = rect.height || 0;
+
+          // Update the state of sliders with new dimensions
+          setRectangleWidth(newWidth);
+          setRectangleHeight(newHeight);
+        }
       }
     }
-  }, [image]);
+  };
+
+  const handleWidthChange = (value: number) => {
+    setRectangleWidth(value);
+    updateCanvasRect();
+  };
+
+  const handleHeightChange = (value: number) => {
+    setRectangleHeight(value);
+    updateCanvasRect();
+  };
+
+  const updateCanvasRect = () => {
+    if (canvasRef.current) {
+      const objects = canvasRef.current.getObjects();
+      if (objects.length > 0) {
+        const rect = objects[0] as fabric.Rect;
+        rect.set({
+          width: rectangleWidth,
+          height: rectangleHeight,
+        });
+        canvasRef.current.renderAll();
+      }
+    }
+  };
 
   const getBoundingCoordinates = () => {
     if (canvasRef.current) {
@@ -67,23 +173,30 @@ const ImageEditor: React.FC = () => {
         const rect = objects[0] as fabric.Rect;
 
         if (rect) {
+          rect.set({
+            width: rectangleWidth,
+            height: rectangleHeight,
+          });
+
+          // Update the table data with the new dimensions
           const newRecord = {
             key: String(tableData.length + 1),
             quality: 'upripe',
             realPredicted: 'real',
             x1: rect.left ?? 0,
             y1: rect.top ?? 0,
-            x2: (rect.left ?? 0) + (rect.width ?? 0),
-            y2: (rect.top ?? 0) + (rect.height ?? 0),
+            x2: (rect.left ?? 0) + rectangleWidth,
+            y2: (rect.top ?? 0) + rectangleHeight,
             imageId: 'your_default_image_id',
           };
-          console.log(rect)
           setTableData([...tableData, newRecord]);
+
+          canvasRef.current.renderAll();
         }
       }
     }
   };
-
+  
   const showCoordinateOnCanvas = (record: any) => {
     if (canvasRef.current) {
       canvasRef.current.clear();
@@ -215,14 +328,34 @@ const ImageEditor: React.FC = () => {
       ),
     },
     {
-      title: 'Actions',
+      title: 'Show Coordinate',
+      dataIndex: 'showCoordinate',
       render: (_text: string, record: any) => (
-        <Dropdown overlay={tableMenu(record)} placement="bottomCenter">
-          <Button icon={<EllipsisOutlined />} />
-        </Dropdown>
+        <Button onClick={() => handleTableMenuClick('showCoordinate', record)} style={{ backgroundColor: '#ff6929', color: 'white' }}>
+          Show Coordinate
+        </Button>
+      ),
+    },
+    {
+      title: 'Remove',
+      dataIndex: 'remove',
+      render: (_text: string, record: any) => (
+        <Button onClick={() => handleTableMenuClick('remove', record)} style={{ backgroundColor: 'red', color: 'white', borderColor:'red' }}>
+          Remove
+        </Button>
+      ),
+    },
+    {
+      title: 'Send to API',
+      dataIndex: 'sendToAPI',
+      render: (_text: string, record: any) => (
+        <Button onClick={() => handleTableMenuClick('sendToAPI', record)} style={{ backgroundColor: 'green', color: 'white', borderColor:'green' }}>
+          Register
+        </Button>
       ),
     },
   ];
+  
 
   const handleTableChange = (key: string, dataIndex: string, value: any) => {
     const newData = [...tableData];
@@ -232,21 +365,55 @@ const ImageEditor: React.FC = () => {
     setTableData(newData);
   };
 
+  if (loading) {
+    return <Spin />;
+  }
+
   return (
     <div className='flex flex-col justify-center'>
       <div className='flex items-center justify-center'>
-        <Button onClick={getBoundingCoordinates} style={{ margin: '15px' }}>
-          Get Bounding Coordinates
-        </Button>
       </div>
       <div className='flex flex-col items-center justify-center'>
         {imageLoadError ? (
           <div>Error loading image. Please check the URL or try again later.</div>
         ) : (
           <>
+          <div className='flex flex-row my-8 justify-evenly'>
             <canvas id="canvas"></canvas>
+              <div className='flex flex-col items-start mx-8 justify-center'>
+              <div className='w-36'>
+                  <span style={{ marginRight: '10px' }}>Width:</span>
+                  <Slider
+                    min={30}
+                    max={200}
+                    step={1}
+                    value={rectangleWidth}
+                    onChange={handleWidthChange}
+                    style={{ width: '80%' }}
+                    trackStyle={{ backgroundColor: '#ff6929' }} 
+                    handleStyle={{ borderColor: '#ff6929', backgroundColor: '#ff6929' }}
+                  />
+                </div>
+                <div className='w-36'>
+                  <span style={{ marginRight: '10px' }}>Height:</span>
+                  <Slider
+                    min={30}
+                    max={200}
+                    step={1}
+                    value={rectangleHeight}
+                    onChange={handleHeightChange}
+                    style={{ width: '80%' }}
+                    trackStyle={{ backgroundColor: '#ff6929' }} 
+                    handleStyle={{ borderColor: '#ff6929', backgroundColor: '#ff6929' }}
+                  />
+                </div>
+                <Button onClick={getBoundingCoordinates}>
+                  Get Bounding Coordinates
+                </Button>
+              </div>
+            </div>
             <div className='mx-8'>
-              <Table columns={columns} dataSource={tableData} />
+              <Table columns={columns} dataSource={tableData} style={{ width: '100%' }} />
             </div>
           </>
         )}

@@ -18,7 +18,7 @@ const DashboardMain = () => {
         {path:'/image/:id', element:<ImageDetailed/>, auth:'Manager'},
         {path:'/profile', element:<Profile/>, auth:'All'},
         {path:'/users', element:<Users/>, auth:'Manager'},
-        {path:'/imageeditor', element:<ImageEditor/>, auth:'Manager'},
+        {path:'/imageeditor/:id', element:<ImageEditor/>, auth:'Manager'},
         {path:'/changepassword', element:<ChangePassword/>, auth:'All'},
       ]
   return (
