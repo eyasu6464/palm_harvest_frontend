@@ -77,7 +77,7 @@ const ImageDetailed = () => {
           <div className="md:w-1/3 zoom-container bg-ff6929">
             <img
               alt="example"
-              src={`https://blackneb.com${imageDetails.imagepath}`}
+              src={`https://palm.blackneb.com${imageDetails.imagepath}`}
               className="max-w-full"
             />
           </div>

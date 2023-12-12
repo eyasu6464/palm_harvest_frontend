@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
-import { Modal, Form, Input, Button, notification, Upload, message } from 'antd';
+import { useState } from 'react';
+import { Form, Button, notification, Upload, message } from 'antd';
 import { UploadOutlined } from '@ant-design/icons';
 import axios from 'axios';
 import { getCookie } from 'typescript-cookie';
