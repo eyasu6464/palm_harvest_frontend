@@ -43,10 +43,10 @@ const Login = ({ setLogin, setCreateAccount }: any) => {
         console.log(error);
       }
       setLoading(false);
-    } catch (error) {
+    } catch (error:any) {
       console.log(error);
       notification.error({
-        message: 'Login Failed',
+        message: error.response.data.detail,
         duration: 5,
         onClose: () => {
           console.log('Notification closed');

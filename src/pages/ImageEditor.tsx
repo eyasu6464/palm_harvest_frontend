@@ -1,9 +1,9 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { fabric } from 'fabric';
 import { useParams } from 'react-router-dom';
-import { Select,Spin, Input, Table, Button, notification, Dropdown, Menu, Slider } from 'antd';
+import { Select,Spin, Input, Table, Button, notification, Slider } from 'antd';
 import axios from 'axios';
-import { EllipsisOutlined } from '@ant-design/icons';
+// import { EllipsisOutlined } from '@ant-design/icons';
 import { getCookie } from 'typescript-cookie';
 import { URL } from '../redux/ActionTypes';
 const { Option } = Select;
@@ -97,6 +97,7 @@ const ImageEditor: React.FC = () => {
       }
     };
     const fetchImageDetails = async () => {
+      console.log(imageDetails)
       try {
         const response = await axios.get(`${URL}image/${id}`, {
           headers: {
@@ -270,13 +271,13 @@ const ImageEditor: React.FC = () => {
     }
   };
 
-  const tableMenu = (record: any) => (
-    <Menu onClick={({ key }) => handleTableMenuClick(key, record)}>
-      <Menu.Item key="showCoordinate">Show Coordinate</Menu.Item>
-      <Menu.Item key="remove">Remove</Menu.Item>
-      <Menu.Item key="sendToAPI">Send to API</Menu.Item>
-    </Menu>
-  );
+  // const tableMenu = (record: any) => (
+  //   <Menu onClick={({ key }) => handleTableMenuClick(key, record)}>
+  //     <Menu.Item key="showCoordinate">Show Coordinate</Menu.Item>
+  //     <Menu.Item key="remove">Remove</Menu.Item>
+  //     <Menu.Item key="sendToAPI">Send to API</Menu.Item>
+  //   </Menu>
+  // );
 
   const columns = [
     {
