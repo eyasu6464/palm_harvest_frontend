@@ -19,7 +19,7 @@ interface ImageDetails {
   branch_id: string;
   branch_name: string;
   branch_city: string;
-  palmdetails: [{
+  palmdetails?: {
     palmid: number;
     quality: string;
     real: boolean;
@@ -30,14 +30,36 @@ interface ImageDetails {
     y2_coordinate: string;
     palm_image_uploaded: string;
     imageid: number;
-  }]
+  }[];
 }
 
 
 const ImageEditor: React.FC = () => {
   const canvasRef = useRef<fabric.Canvas | null>(null);
   const { id } = useParams<{ id: string }>();
-  const [imageDetails, setImageDetails] = useState<ImageDetails | null>(null);
+  const [imageDetails, setImageDetails] = useState<ImageDetails | null>({
+    imageid: 0,
+    imagepath: '',
+    image_created: '',
+    image_uploaded: '',
+    harvester_id: 0,
+    harvester_fullname: '',
+    branch_id: '',
+    branch_name: '',
+    branch_city: '',
+    palmdetails: [{
+      palmid: 0,
+      quality: '',
+      real: false,
+      predicted: false,
+      x1_coordinate: '',
+      y1_coordinate: '',
+      x2_coordinate: '',
+      y2_coordinate: '',
+      palm_image_uploaded: '',
+      imageid: 0,
+    }],
+  });
   const [loading, setLoading] = useState<boolean>(true);
   const [image, setImage] = useState<string | null>();
   const [tableData, setTableData] = useState<any[]>([]);
@@ -199,6 +221,7 @@ const ImageEditor: React.FC = () => {
   };
   
   const showCoordinateOnCanvas = (record: any) => {
+    console.log(record)
     if (canvasRef.current) {
       canvasRef.current.clear();
       fabric.Image.fromURL(image!, (img) => {
@@ -208,13 +231,13 @@ const ImageEditor: React.FC = () => {
         );
       });
       const rect = new fabric.Rect({
-        left: record.x1,
-        top: record.y1,
+        left: parseInt(record.x1_coordinate || record.x1),
+        top: parseInt(record.y1_coordinate || record.y1),
         fill: 'transparent',
         stroke: 'red',
         strokeWidth: 2,
-        width: record.x2 - record.x1,
-        height: record.y2 - record.y1,
+        width: parseInt(record.x2_coordinate || record.x2) - parseInt(record.x1_coordinate || record.x1),
+        height: parseInt(record.y2_coordinate || record.y2) - parseInt(record.y1_coordinate || record.y1),
       });
 
       canvasRef.current.add(rect);
@@ -222,9 +245,62 @@ const ImageEditor: React.FC = () => {
     }
   };
 
-  const sendToAPI = async (record: any) => {
+  const removeRegisteredCoordinate = (palmid: number) => {
+    if (imageDetails && imageDetails.palmdetails !== undefined) {
+      const updatedPalmdetails = imageDetails.palmdetails.filter(
+        (palm) => palm.palmid !== palmid
+      );
+      setImageDetails({
+        ...imageDetails,
+        palmdetails: updatedPalmdetails,
+      });
+    }
+  };
+
+  const deleteTableRow = async(record: any) => {
+    console.log('Deleting palm with ID:', record.palmid);
     try {
-      const response = await axios.post(URL + 'registerbranch/', record, {
+      const response = await axios.delete(URL + `deletepalmdetail/${record.palmid}`, {
+        headers: {
+          Authorization: `Bearer ${userAccessKey}`,
+          'Content-Type': 'application/json',
+        },
+      });
+      console.log(response.data);
+      removeRegisteredCoordinate(record.palmid);
+      notification.success({
+        message: 'Deleted Successfully',
+        duration: 5,
+        onClose: () => {
+          console.log('Notification closed');
+        },
+      });
+    } catch (error) {
+      console.log(error);
+      notification.error({
+        message: 'Please Try again',
+        duration: 5,
+        onClose: () => {
+          console.log('Notification closed');
+        },
+      });
+    }
+  };
+
+
+  const sendToAPI = async (record: any) => {
+    const apiRecord = {
+      quality: record.quality,
+      imageid: imageDetails?.imageid,
+      real: true,
+      predicted: false,
+      x1_coordinate: record.x1,
+      y1_coordinate: record.y1,
+      x2_coordinate: record.x2,
+      y2_coordinate: record.y2,
+    };
+    try {
+      const response = await axios.post(URL + 'createpalmdetail/', apiRecord, {
         headers: {
           Authorization: `Bearer ${userAccessKey}`,
           'Content-Type': 'application/json',
@@ -232,7 +308,7 @@ const ImageEditor: React.FC = () => {
       });
       console.log(response.data);
       notification.success({
-        message: 'Branch Added Successfully',
+        message: 'Registred Successfully',
         duration: 5,
         onClose: () => {
           console.log('Notification closed');
@@ -266,6 +342,9 @@ const ImageEditor: React.FC = () => {
       case 'sendToAPI':
         sendToAPI(record);
         break;
+      case 'delete':
+        deleteTableRow(record);
+        break;
       default:
         break;
     }
@@ -278,6 +357,65 @@ const ImageEditor: React.FC = () => {
   //     <Menu.Item key="sendToAPI">Send to API</Menu.Item>
   //   </Menu>
   // );
+
+  const palmDetailsColumns = [
+    {
+      title: 'Palm ID',
+      dataIndex: 'palmid',
+    },
+    {
+      title: 'Quality',
+      dataIndex: 'quality',
+    },
+    {
+      title: 'Real/Predicted',
+      dataIndex: 'realPredicted',
+      render: (_text: string, record: any) => (
+        <span>{record.real ? 'Real' : 'Predicted'}</span>
+      ),
+    },
+    {
+      title: 'X1 Coordinate',
+      dataIndex: 'x1_coordinate',
+    },
+    {
+      title: 'Y1 Coordinate',
+      dataIndex: 'y1_coordinate',
+    },
+    {
+      title: 'X2 Coordinate',
+      dataIndex: 'x2_coordinate',
+    },
+    {
+      title: 'Y2 Coordinate',
+      dataIndex: 'y2_coordinate',
+    },
+    {
+      title: 'Image ID',
+      dataIndex: 'imageId',
+      render: (_text: string) => (
+        <span>{imageDetails?.imageid || 'your_default_image_id'}</span>
+      ),
+    },
+    {
+      title: 'Show Coordinate',
+      dataIndex: 'showCoordinate',
+      render: (_text: string, record: any) => (
+        <Button onClick={() => handleTableMenuClick('showCoordinate', record)} style={{ backgroundColor: '#ff6929', color: 'white' }}>
+          Show Coordinate
+        </Button>
+      ),
+    },
+    {
+      title: 'Delete',
+      dataIndex: 'delete',
+      render: (_text: string, record: any) => (
+        <Button onClick={() => handleTableMenuClick('delete', record)} style={{ backgroundColor: 'red', color: 'white', borderColor: 'red' }}>
+          Delete
+        </Button>
+      ),
+    },
+  ];
 
   const columns = [
     {
@@ -324,8 +462,8 @@ const ImageEditor: React.FC = () => {
     {
       title: 'Image ID',
       dataIndex: 'imageId',
-      render: (_text: string, record: any) => (
-        <Input onChange={(e) => handleTableChange(record.key, 'imageId', e.target.value)} />
+      render: (_text: string) => (
+        <span>{imageDetails?.imageid || 'your_default_image_id'}</span>
       ),
     },
     {
@@ -347,7 +485,7 @@ const ImageEditor: React.FC = () => {
       ),
     },
     {
-      title: 'Send to API',
+      title: 'Register',
       dataIndex: 'sendToAPI',
       render: (_text: string, record: any) => (
         <Button onClick={() => handleTableMenuClick('sendToAPI', record)} style={{ backgroundColor: 'green', color: 'white', borderColor:'green' }}>
@@ -379,14 +517,14 @@ const ImageEditor: React.FC = () => {
           <div>Error loading image. Please check the URL or try again later.</div>
         ) : (
           <>
-          <div className='flex flex-row my-8 justify-evenly'>
+          <div className='flex flex-col my-8 justify-evenly'>
             <canvas id="canvas"></canvas>
-              <div className='flex flex-col items-start mx-8 justify-center'>
-              <div className='w-36'>
+              <div className='flex flex-row items-start my-8 justify-center'>
+              <div className='w-48'>
                   <span style={{ marginRight: '10px' }}>Width:</span>
                   <Slider
                     min={30}
-                    max={200}
+                    max={500}
                     step={1}
                     value={rectangleWidth}
                     onChange={handleWidthChange}
@@ -399,7 +537,7 @@ const ImageEditor: React.FC = () => {
                   <span style={{ marginRight: '10px' }}>Height:</span>
                   <Slider
                     min={30}
-                    max={200}
+                    max={500}
                     step={1}
                     value={rectangleHeight}
                     onChange={handleHeightChange}
@@ -414,7 +552,17 @@ const ImageEditor: React.FC = () => {
               </div>
             </div>
             <div className='mx-8'>
-              <Table columns={columns} dataSource={tableData} style={{ width: '100%' }} />
+              <Table columns={columns} dataSource={tableData} style={{ width: '95vw' }} title={() => 
+                <div>
+                  <p className='font-bold text-lg' style={{color:"#ff6929"}}>Pending Coordinates</p>
+                </div>} 
+              />
+            </div>
+            <div className='mx-8'>
+              <Table columns={palmDetailsColumns} dataSource={imageDetails?.palmdetails || []}  style={{ width: '95vw' }} title={() => 
+                <div>
+                  <p className='font-bold text-lg' style={{color:"#ff6929"}}>Registered Coordinates</p>
+                </div>} />
             </div>
           </>
         )}
