@@ -67,6 +67,8 @@ const ImageEditor: React.FC = () => {
   const [imageLoadError, setImageLoadError] = useState<boolean>(false);
   const [rectangleWidth, setRectangleWidth] = useState<number>(100);
   const [rectangleHeight, setRectangleHeight] = useState<number>(100);
+  const [palmDetailsArr, setPalmDetailsArr] = useState<any[]>([]);
+
 
   useEffect(() => {
     const initializeCanvas = async () => {
@@ -118,6 +120,8 @@ const ImageEditor: React.FC = () => {
         }
       }
     };
+
+    
     const fetchImageDetails = async () => {
       console.log(imageDetails)
       try {
@@ -130,6 +134,7 @@ const ImageEditor: React.FC = () => {
         setImageDetails(response.data);
         setImage(`https://palm.blackneb.com${response.data.imagepath}`);
         console.log(`https://palm.blackneb.com${response.data.imagepath}`);
+
         if(image !== undefined){
           initializeCanvas();
         }
@@ -144,8 +149,24 @@ const ImageEditor: React.FC = () => {
         setLoading(false);
       }
     };
+    getPalmDetails()
     fetchImageDetails();
   }, [id, image, rectangleWidth, rectangleHeight]);
+
+  const getPalmDetails = async () => {
+    try{
+      const response = await axios.get(`${URL}getPalmDetails/${id}`, {
+        headers: {
+          Authorization: `Bearer ${userAccessKey}`,
+          'Content-Type': 'application/json',
+        },
+      });
+      setPalmDetailsArr(response.data);
+    }
+    catch(error:any){
+      console.log(error)
+    }
+  }
 
   const handleObjectModified = () => {
     if (canvasRef.current) {
@@ -245,20 +266,8 @@ const ImageEditor: React.FC = () => {
     }
   };
 
-  const removeRegisteredCoordinate = (palmid: number) => {
-    if (imageDetails && imageDetails.palmdetails !== undefined) {
-      const updatedPalmdetails = imageDetails.palmdetails.filter(
-        (palm) => palm.palmid !== palmid
-      );
-      setImageDetails({
-        ...imageDetails,
-        palmdetails: updatedPalmdetails,
-      });
-    }
-  };
-
-  const deleteTableRow = async(record: any) => {
-    console.log('Deleting palm with ID:', record.palmid);
+  const deleteTableRow = async (record: any) => {
+    console.log('Deleting palm with ID:', record);
     try {
       const response = await axios.delete(URL + `deletepalmdetail/${record.palmid}`, {
         headers: {
@@ -267,7 +276,7 @@ const ImageEditor: React.FC = () => {
         },
       });
       console.log(response.data);
-      removeRegisteredCoordinate(record.palmid);
+      removeRegisteredTableRow(record.palmid)
       notification.success({
         message: 'Deleted Successfully',
         duration: 5,
@@ -286,6 +295,14 @@ const ImageEditor: React.FC = () => {
       });
     }
   };
+
+  const removeRegisteredTableRow = (key: string) => {
+    console.log(palmDetailsArr)
+    const newTableData = palmDetailsArr.filter((record:any) => record.palmid !== key);
+    console.log(newTableData)
+    setPalmDetailsArr(newTableData);
+  };
+  
 
 
   const sendToAPI = async (record: any) => {
@@ -306,6 +323,8 @@ const ImageEditor: React.FC = () => {
           'Content-Type': 'application/json',
         },
       });
+      removeTableRow(record.key);
+      getPalmDetails();
       console.log(response.data);
       notification.success({
         message: 'Registred Successfully',
@@ -559,7 +578,7 @@ const ImageEditor: React.FC = () => {
               />
             </div>
             <div className='mx-8'>
-              <Table columns={palmDetailsColumns} dataSource={imageDetails?.palmdetails || []}  style={{ width: '95vw' }} title={() => 
+              <Table columns={palmDetailsColumns} dataSource={palmDetailsArr || []}  style={{ width: '95vw' }} title={() => 
                 <div>
                   <p className='font-bold text-lg' style={{color:"#ff6929"}}>Registered Coordinates</p>
                 </div>} />
