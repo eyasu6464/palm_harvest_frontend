@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { Descriptions, Spin, notification, Card, Button } from 'antd';
+import { Descriptions, Spin, notification, Card, Button, Popconfirm } from 'antd';
 import { useParams, useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import { getCookie } from 'typescript-cookie';
@@ -33,6 +33,7 @@ interface ImageDetails {
 const ImageDetailed = () => {
   const { id } = useParams<{ id: string }>();
   const [imageDetails, setImageDetails] = useState<ImageDetails | null>(null);
+  const [popConfirmVisible, setPopConfirmVisible] = useState<boolean>(false);
   const [loading, setLoading] = useState<boolean>(true);
   const userAccessKey = getCookie("userAccessKey");
   const navigate = useNavigate();
@@ -65,6 +66,47 @@ const ImageDetailed = () => {
     navigate(`/imageeditor/${id}`)
   };
 
+  const showPopConfirm = () => {
+    setPopConfirmVisible(true);
+  };
+
+  const hidePopConfirm = () => {
+    setPopConfirmVisible(false);
+  };
+  const handleDeleteImage = async () => {
+    try {
+      // Assuming you have an API endpoint for deleting the image
+      const response = await axios.delete(`${URL}deleteimage/${id}`, {
+        headers: {
+          Authorization: `Bearer ${userAccessKey}`,
+          'Content-Type': 'application/json',
+        },
+      });
+  
+      if (response.status === 200) {
+        notification.success({
+          message: 'Image deleted successfully!',
+          duration: 5,
+        });
+        navigate('/allimages');
+      } else {
+        notification.error({
+          message: 'Failed to delete image. Please try again!',
+          duration: 5,
+        });
+      }
+    } catch (error:any) {
+      console.error('Error deleting image:', error);
+      notification.error({
+        message: 'Failed to delete image. Please try again!',
+        description: error.message,
+        duration: 5,
+      });
+    } finally {
+      hidePopConfirm();
+    }
+  };
+
   if (loading) {
     return <Spin />;
   }
@@ -86,6 +128,23 @@ const ImageDetailed = () => {
             <Button type="primary" style={{ backgroundColor: '#ff6929', color: 'white', marginTop:'5px', width: '100%' }} onClick={handleEditImage} >
                   Edit
             </Button>
+            <Popconfirm
+              title="Are you sure you want to delete this image?"
+              visible={popConfirmVisible}
+              onConfirm={handleDeleteImage}
+              onCancel={hidePopConfirm}
+              okText="Yes"
+              cancelText="No"
+              okButtonProps={{ style: { backgroundColor: '#ff6929', color: 'white' } }}
+            >
+              <Button
+                type="primary"
+                style={{ backgroundColor: 'red', color: 'white', marginTop:'5px', width: '100%' }}
+                onClick={showPopConfirm}
+              >
+                Delete
+              </Button>
+            </Popconfirm>
           </div>
           <div className='md:w-2/3 mx-4'>
             <Descriptions bordered column={1} style={{ marginTop: '16px' }}>
