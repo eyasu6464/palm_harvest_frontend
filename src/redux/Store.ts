@@ -1,7 +1,7 @@
 import { combineReducers, createStore } from "redux";
 import {composeWithDevTools} from '@redux-devtools/extension';
 
-import { addUserInformationReducer, addUserListReducer, isUserLoggedReduer, addPalmImageDetailsReducer } from "./Reducer";
+import { addUserInformationReducer, addUserListReducer, isUserLoggedReduer, addPalmImageDetailsReducer, addHarvestersListReducer } from "./Reducer";
 
 const reducers = combineReducers(
     {
@@ -9,6 +9,7 @@ const reducers = combineReducers(
         userList:addUserListReducer,
         userLogged: isUserLoggedReduer,
         palmImageDetails:addPalmImageDetailsReducer,
+        harvestersList:addHarvestersListReducer,
     }
 );
 
