@@ -43,7 +43,7 @@ const BranchImageUploadedMonthly: React.FC = () => {
     labels,
     datasets: [
       {
-        label: 'Images Uploaded',
+        label: 'Fruits Harvested',
         data: sampleData[selectedBranch],
         borderColor: 'rgb(255, 99, 132)',
         backgroundColor: 'rgba(255, 99, 132, 0.5)',
@@ -53,7 +53,7 @@ const BranchImageUploadedMonthly: React.FC = () => {
 
   return (
     <div className='w-96 drop-shadow-xl m-2 p-4 bg-white rounded-md'>
-    <p style={{color:"#ff6929"}} className='font-semibold'>Monthly Branch Image Uploads</p>
+    <p style={{color:"#ff6929"}} className='font-semibold'>Monthly Branch Fruits Harvested</p>
       <Select style={{ width: 200 }} defaultValue={selectedBranch} onChange={handleBranchChange}>
         <Option value="branch1">Branch 1</Option>
         <Option value="branch2">Branch 2</Option>

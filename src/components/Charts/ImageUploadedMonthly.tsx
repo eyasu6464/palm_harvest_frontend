@@ -40,7 +40,7 @@ const data = {
   labels,
   datasets: [
     {
-      label: 'Images Uploaded',
+      label: 'Fruits Harvested',
       data: [50, 560, 27, 275, 14, 335, 80], // Replace with your sample data
       borderColor: 'rgb(255, 99, 132)',
       backgroundColor: 'rgba(255, 99, 132, 0.5)',
@@ -51,7 +51,7 @@ const data = {
 const ImageUploadedMonthly: React.FC = () => {
   return(
   <div className='w-96 drop-shadow-xl m-2 p-4 bg-white rounded-md'>
-    <p style={{color:"#ff6929"}} className='font-semibold'>Monthly Image Uploads</p>
+    <p style={{color:"#ff6929"}} className='font-semibold'>Monthly Fruits Harvested</p>
     <Line options={options} data={data} />
   </div>
   )

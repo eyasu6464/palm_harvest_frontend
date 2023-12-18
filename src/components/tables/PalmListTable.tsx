@@ -3,7 +3,7 @@ import { Table, Tag, Input, Button, Select } from 'antd';
 
 const { Option } = Select;
 
-const sampleData = [
+const sampleData: PalmListData[] = [
     {
       imageId: 1,
       imageCreated: '2023-01-01',
@@ -13,7 +13,8 @@ const sampleData = [
       unripe: 15,
       ripe: 25,
       overRipe: 10,
-      real:true,
+      real: 20,
+      predicted: 10,
     },
     {
       imageId: 2,
@@ -24,7 +25,8 @@ const sampleData = [
       unripe: 10,
       ripe: 20,
       overRipe: 10,
-      real:true,
+      real: 30,
+      predicted: 25,
     },
     {
       imageId: 3,
@@ -35,7 +37,8 @@ const sampleData = [
       unripe: 8,
       ripe: 15,
       overRipe: 12,
-      real:true,
+      real: 15,
+      predicted: 5,
     },
     {
       imageId: 4,
@@ -46,7 +49,8 @@ const sampleData = [
       unripe: 12,
       ripe: 18,
       overRipe: 15,
-      real:false,
+      real: 40,
+      predicted: 20,
     },
     {
       imageId: 5,
@@ -57,65 +61,71 @@ const sampleData = [
       unripe: 20,
       ripe: 25,
       overRipe: 15,
-      real:false,
+      real: 10,
+      predicted: 30,
     },
     {
-      imageId: 6,
-      imageCreated: '2023-06-01',
-      imageUploaded: '2023-06-05',
-      branchName: 'Branch F',
-      numberOfFruits: 55,
-      unripe: 18,
-      ripe: 22,
-      overRipe: 15,
-      real:true,
-    },
-    {
-      imageId: 7,
-      imageCreated: '2023-07-01',
-      imageUploaded: '2023-07-10',
-      branchName: 'Branch G',
-      numberOfFruits: 40,
-      unripe: 10,
-      ripe: 18,
-      overRipe: 12,
-      real:false,
-    },
-    {
-      imageId: 8,
-      imageCreated: '2023-08-01',
-      imageUploaded: '2023-08-08',
-      branchName: 'Branch H',
-      numberOfFruits: 30,
-      unripe: 8,
-      ripe: 15,
-      overRipe: 7,
-      real:true,
-    },
-    {
-      imageId: 9,
-      imageCreated: '2023-09-01',
-      imageUploaded: '2023-09-15',
-      branchName: 'Branch I',
-      numberOfFruits: 50,
-      unripe: 15,
-      ripe: 25,
-      overRipe: 10,
-      real:false,
-    },
-    {
-      imageId: 10,
-      imageCreated: '2023-10-01',
-      imageUploaded: '2023-10-10',
-      branchName: 'Branch J',
-      numberOfFruits: 30,
-      unripe: 8,
-      ripe: 15,
-      overRipe: 7,
-      real:true,
-    },
+        imageId: 6,
+        imageCreated: '2023-06-01',
+        imageUploaded: '2023-06-05',
+        branchName: 'Branch F',
+        numberOfFruits: 55,
+        unripe: 18,
+        ripe: 22,
+        overRipe: 15,
+        real: 25,
+        predicted: 15,
+      },
+      {
+        imageId: 7,
+        imageCreated: '2023-07-01',
+        imageUploaded: '2023-07-10',
+        branchName: 'Branch G',
+        numberOfFruits: 40,
+        unripe: 10,
+        ripe: 18,
+        overRipe: 12,
+        real: 35,
+        predicted: 30,
+      },
+      {
+        imageId: 8,
+        imageCreated: '2023-08-01',
+        imageUploaded: '2023-08-08',
+        branchName: 'Branch H',
+        numberOfFruits: 30,
+        unripe: 8,
+        ripe: 15,
+        overRipe: 7,
+        real: 20,
+        predicted: 10,
+      },
+      {
+        imageId: 9,
+        imageCreated: '2023-09-01',
+        imageUploaded: '2023-09-15',
+        branchName: 'Branch I',
+        numberOfFruits: 50,
+        unripe: 15,
+        ripe: 25,
+        overRipe: 10,
+        real: 15,
+        predicted: 5,
+      },
+      {
+        imageId: 10,
+        imageCreated: '2023-10-01',
+        imageUploaded: '2023-10-10',
+        branchName: 'Branch J',
+        numberOfFruits: 30,
+        unripe: 8,
+        ripe: 15,
+        overRipe: 7,
+        real: 30,
+        predicted: 20,
+      },
   ];
-    
+
 
 interface PalmListData {
   imageId: number;
@@ -126,7 +136,8 @@ interface PalmListData {
   unripe: number;
   ripe: number;
   overRipe: number;
-  real:boolean;
+  real:number;
+  predicted:number;
 }
 
 const PalmListTable: React.FC = () => {
@@ -140,6 +151,7 @@ const PalmListTable: React.FC = () => {
         ripe: item.ripe,
         overRipe: item.overRipe,
         real: item.real,
+        predicted: item.predicted,
       }));
 
     const uniqueBranchNames = Array.from(new Set(sampleData.map(item => item.branchName)));
@@ -278,39 +290,21 @@ const PalmListTable: React.FC = () => {
       ),
     },
     {
-        title: 'Real/Predicted',
+        title: 'Real',
         dataIndex: 'real',
         key: 'real',
-        filterDropdown: ({ setSelectedKeys, selectedKeys, confirm, clearFilters }: any) => (
-          <div style={{ padding: 8 }}>
-            <Select
-              value={selectedKeys[0]}
-              onChange={(value) => setSelectedKeys(value ? [value] : [])}
-              style={{ width: 188, marginBottom: 8, display: 'block' }}
-            >
-              <Option value="">All</Option>
-              <Option value="true">Real</Option>
-              <Option value="false">Predicted</Option>
-            </Select>
-            <Button
-              type="primary"
-              onClick={() => confirm()}
-              size="small"
-              style={{ width: 90, marginRight: 8, backgroundColor: '#ff6929', borderColor: '#ff6929' }}
-            >
-              Filter
-            </Button>
-            <Button onClick={() => clearFilters()} size="small" style={{ width: 90 }}>
-              Reset
-            </Button>
-          </div>
+        render: (real: number) => (
+        <Tag color='blue'>{real}</Tag>
         ),
-        onFilter: (value: any, record: any) =>
-          record.real === (value === 'true' ? true : false),
-        render: (real: boolean) => (
-          <Tag color={real ? 'green' : 'blue'}>{real ? 'Real' : 'Predicted'}</Tag>
+    },
+    {
+        title: 'Predicted',
+        dataIndex: 'predicted',
+        key: 'predicted',
+        render: (predicted: number) => (
+        <Tag color='green'>{predicted}</Tag>
         ),
-      },
+    },
   ];
 
   const paginationConfig = {

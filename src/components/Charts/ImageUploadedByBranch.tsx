@@ -54,7 +54,7 @@ export const imageData = {
   labels: branchLabels,
   datasets: [
     {
-      label: 'Number of Images Uploaded',
+      label: 'Number of Fruits Harvested',
       data: imageCounts,
       borderColor: 'rgb(255, 105, 41)',
       backgroundColor: 'rgba(255, 105, 41, 0.5)',
@@ -65,7 +65,7 @@ export const imageData = {
 const ImageUploadedByBranch = () => {
   return (
     <div className='w-96 drop-shadow-xl m-2 p-4 bg-white rounded-md'>
-        <p style={{color:"#ff6929"}} className='font-semibold'>Images Uploaded By Branch</p>
+        <p style={{color:"#ff6929"}} className='font-semibold'>Number of fruits harvested by Branch</p>
         <Bar options={options} data={imageData} />
     </div>
   );
