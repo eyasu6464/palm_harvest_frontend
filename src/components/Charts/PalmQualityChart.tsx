@@ -38,7 +38,7 @@ const chartOptions = {
 
 const PalmQualityChart = () => {
   return (
-    <div className='w-64 shadow-md m-2 p-4'>
+    <div className='w-64 drop-shadow-xl m-2 p-4 bg-white rounded-md'>
       <p style={{color:"#ff6929"}} className='font-semibold'>Palm Quality Distribution</p>
       <Doughnut data={qualityData} options={chartOptions} />
     </div>

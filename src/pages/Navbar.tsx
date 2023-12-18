@@ -70,7 +70,7 @@ const Navbar = () => {
 
   return (
     <div>
-      <nav className="bg-white border-white h-20 dark:bg-white shadow-lg">
+      <nav className="bg-white border-white h-20 dark:bg-white drop-shadow-xl">
         <div className="max-w-screen-xl flex flex-wrap items-center justify-between mx-auto p-4">
           <div className="flex flex-row justify-between">
             <Link to="/">

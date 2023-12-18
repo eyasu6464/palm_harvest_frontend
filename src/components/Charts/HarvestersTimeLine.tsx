@@ -35,7 +35,7 @@ const HarvestersTimeLine = () => {
   const filteredData = getHarvesterData(selectedHarvester);
 
   return (
-    <div className="w-96 shadow-md m-2 p-4">
+    <div className="w-96 drop-shadow-xl m-2 p-4 bg-white rounded-md">
       <p style={{color:"#ff6929"}} className='font-semibold'>Harvesters Workflow</p>
       <Select
         placeholder="Harvester Name"
