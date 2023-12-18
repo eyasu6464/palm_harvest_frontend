@@ -104,15 +104,17 @@ const ImageEditor: React.FC = () => {
                 strokeWidth: 2,
                 width: rectangleWidth,
                 height: rectangleHeight,
-                hasControls: false,
+                hasControls: true,
                 hasBorders: false,
+                cornerStyle: 'circle',
+                lockRotation: true,
               });
 
               canvasRef.current?.add(initialRect);
               canvasRef.current?.renderAll();
 
               // Listen for object modification events
-              canvasRef.current?.on('object:modified', handleObjectModified);
+              canvasRef.current?.on('object:scaling', handleObjectScaling);
             } else {
               setImageLoadError(true);
             }
@@ -168,23 +170,24 @@ const ImageEditor: React.FC = () => {
     }
   }
 
-  const handleObjectModified = () => {
+  const handleObjectScaling = (e: any) => {
     if (canvasRef.current) {
-      const objects = canvasRef.current.getObjects();
-      if (objects.length > 0) {
-        const rect = objects[0] as fabric.Rect;
+      const rect = e.target as fabric.Rect;
 
-        if (rect) {
-          const newWidth = rect.width || 0;
-          const newHeight = rect.height || 0;
+      if (rect && rect.width !== undefined && rect.height !== undefined && rect.scaleX !== undefined && rect.scaleY !== undefined) {
+        // Manually set the width and height based on scaling
+        const newWidth = rect.width * rect.scaleX || 0;
+        const newHeight = rect.height * rect.scaleY || 0;
 
-          // Update the state of sliders with new dimensions
-          setRectangleWidth(newWidth);
-          setRectangleHeight(newHeight);
-        }
+        // Update the state of sliders with new dimensions
+        setRectangleWidth(newWidth);
+        setRectangleHeight(newHeight);
+
+        // Manually set the width and height of the rectangle object
       }
     }
   };
+
 
   const handleWidthChange = (value: number) => {
     setRectangleWidth(value);
@@ -235,6 +238,29 @@ const ImageEditor: React.FC = () => {
           };
           setTableData([...tableData, newRecord]);
 
+          canvasRef.current.renderAll();
+        }
+      }
+    }
+  };
+
+  const handleReset = () => {
+    setRectangleWidth(50);
+    setRectangleHeight(50);
+
+    if (canvasRef.current) {
+      const objects = canvasRef.current.getObjects();
+      if (objects.length > 0) {
+        const rect = objects[0] as fabric.Rect;
+
+        if (rect) {
+          // Set the initial position and dimensions
+          rect.set({
+            left: 50,
+            top: 50,
+            width: 50,
+            height: 50,
+          });
           canvasRef.current.renderAll();
         }
       }
@@ -567,6 +593,9 @@ const ImageEditor: React.FC = () => {
                 </div>
                 <Button onClick={getBoundingCoordinates}>
                   Get Bounding Coordinates
+                </Button>
+                <Button onClick={handleReset} style={{ marginLeft: '10px' }}>
+                  Reset
                 </Button>
               </div>
             </div>
