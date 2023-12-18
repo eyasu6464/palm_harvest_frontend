@@ -220,10 +220,10 @@ const ImageEditor: React.FC = () => {
         const rect = objects[0] as fabric.Rect;
 
         if (rect) {
-          rect.set({
-            width: rectangleWidth,
-            height: rectangleHeight,
-          });
+          // rect.set({
+          //   width: rectangleWidth,
+          //   height: rectangleHeight,
+          // });
 
           // Update the table data with the new dimensions
           const newRecord = {
