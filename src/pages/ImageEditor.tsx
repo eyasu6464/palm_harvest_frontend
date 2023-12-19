@@ -468,7 +468,7 @@ const ImageEditor: React.FC = () => {
       dataIndex: 'quality',
       render: (_text: string, record: any) => (
         <Select defaultValue="upripe" onChange={(value) => handleTableChange(record.key, 'quality', value)}>
-          <Option value="upripe">Unripe</Option>
+          <Option value="unripe">Unripe</Option>
           <Option value="ripe">Ripe</Option>
           <Option value="overripe">Overripe</Option>
         </Select>

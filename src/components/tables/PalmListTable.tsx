@@ -1,139 +1,19 @@
-import React from 'react';
-import { Table, Tag, Input, Button, Select } from 'antd';
+import React, { useEffect, useState } from 'react';
+import { Table, Tag, Input, Button, Select, notification } from 'antd';
+import axios from 'axios';
+import { URL } from '../../redux/ActionTypes';
+import { getCookie } from 'typescript-cookie';
 
 const { Option } = Select;
-
-const sampleData: PalmListData[] = [
-    {
-      imageId: 1,
-      imageCreated: '2023-01-01',
-      imageUploaded: '2023-01-05',
-      branchName: 'Branch A',
-      numberOfFruits: 50,
-      unripe: 15,
-      ripe: 25,
-      overRipe: 10,
-      real: 20,
-      predicted: 10,
-    },
-    {
-      imageId: 2,
-      imageCreated: '2023-02-01',
-      imageUploaded: '2023-02-08',
-      branchName: 'Branch B',
-      numberOfFruits: 40,
-      unripe: 10,
-      ripe: 20,
-      overRipe: 10,
-      real: 30,
-      predicted: 25,
-    },
-    {
-      imageId: 3,
-      imageCreated: '2023-03-01',
-      imageUploaded: '2023-03-15',
-      branchName: 'Branch C',
-      numberOfFruits: 35,
-      unripe: 8,
-      ripe: 15,
-      overRipe: 12,
-      real: 15,
-      predicted: 5,
-    },
-    {
-      imageId: 4,
-      imageCreated: '2023-04-01',
-      imageUploaded: '2023-04-20',
-      branchName: 'Branch D',
-      numberOfFruits: 45,
-      unripe: 12,
-      ripe: 18,
-      overRipe: 15,
-      real: 40,
-      predicted: 20,
-    },
-    {
-      imageId: 5,
-      imageCreated: '2023-05-01',
-      imageUploaded: '2023-05-10',
-      branchName: 'Branch E',
-      numberOfFruits: 60,
-      unripe: 20,
-      ripe: 25,
-      overRipe: 15,
-      real: 10,
-      predicted: 30,
-    },
-    {
-        imageId: 6,
-        imageCreated: '2023-06-01',
-        imageUploaded: '2023-06-05',
-        branchName: 'Branch F',
-        numberOfFruits: 55,
-        unripe: 18,
-        ripe: 22,
-        overRipe: 15,
-        real: 25,
-        predicted: 15,
-      },
-      {
-        imageId: 7,
-        imageCreated: '2023-07-01',
-        imageUploaded: '2023-07-10',
-        branchName: 'Branch G',
-        numberOfFruits: 40,
-        unripe: 10,
-        ripe: 18,
-        overRipe: 12,
-        real: 35,
-        predicted: 30,
-      },
-      {
-        imageId: 8,
-        imageCreated: '2023-08-01',
-        imageUploaded: '2023-08-08',
-        branchName: 'Branch H',
-        numberOfFruits: 30,
-        unripe: 8,
-        ripe: 15,
-        overRipe: 7,
-        real: 20,
-        predicted: 10,
-      },
-      {
-        imageId: 9,
-        imageCreated: '2023-09-01',
-        imageUploaded: '2023-09-15',
-        branchName: 'Branch I',
-        numberOfFruits: 50,
-        unripe: 15,
-        ripe: 25,
-        overRipe: 10,
-        real: 15,
-        predicted: 5,
-      },
-      {
-        imageId: 10,
-        imageCreated: '2023-10-01',
-        imageUploaded: '2023-10-10',
-        branchName: 'Branch J',
-        numberOfFruits: 30,
-        unripe: 8,
-        ripe: 15,
-        overRipe: 7,
-        real: 30,
-        predicted: 20,
-      },
-  ];
-
 
 interface PalmListData {
   imageId: number;
   imageCreated: string;
   imageUploaded: string;
+  harvesterName: string;
   branchName: string;
   numberOfFruits: number;
-  unripe: number;
+  unRipe: number;
   ripe: number;
   overRipe: number;
   real:number;
@@ -141,20 +21,37 @@ interface PalmListData {
 }
 
 const PalmListTable: React.FC = () => {
-    const extractedData: PalmListData[] = sampleData.map((item) => ({
-        imageId: item.imageId,
-        imageCreated: item.imageCreated,
-        imageUploaded: item.imageUploaded,
-        branchName: item.branchName,
-        numberOfFruits: item.numberOfFruits,
-        unripe: item.unripe,
-        ripe: item.ripe,
-        overRipe: item.overRipe,
-        real: item.real,
-        predicted: item.predicted,
-      }));
+  const [loading, setLoading] = useState<boolean>(false);
+  const [palmListData, setPalmListData] = useState<PalmListData[]>([]);
+  const userAccessKey = getCookie('userAccessKey');
+  const uniqueBranchNames = Array.from(new Set(palmListData.map(item => item.branchName)));
+  const uniqueHarvesterNames = Array.from(new Set(palmListData.map((item) => item.harvesterName)));
 
-    const uniqueBranchNames = Array.from(new Set(sampleData.map(item => item.branchName)));
+    useEffect(() => {
+      const fetchPalmListData = async () => {
+        try {
+          setLoading(true);
+          const response = await axios.get(`${URL}getpalmlist/`, {
+            headers: {
+              Authorization: `Bearer ${userAccessKey}`,
+              'Content-Type': 'application/json',
+            },
+          });
+          setPalmListData(response.data);
+        } catch (error:any) {
+          console.error('Error fetching palm list data:', error);
+          notification.error({
+            message: error.response?.data?.message || 'Error fetching data',
+            description: error.message || 'Unknown error',
+            duration: 5,
+          });
+        } finally {
+          setLoading(false);
+        }
+      };
+  
+      fetchPalmListData();
+    }, []);
 
   const columns = [
     {
@@ -180,7 +77,7 @@ const PalmListTable: React.FC = () => {
               type="primary"
               onClick={() => confirm()}
               size="small"
-              style={{ width: 90, marginRight: 8 }}
+              style={{ width: 90, marginRight: 8, backgroundColor: '#ff6929', borderColor: '#ff6929' }}
             >
               Filter
             </Button>
@@ -220,6 +117,41 @@ const PalmListTable: React.FC = () => {
         ),
         onFilter: (value: any, record: any) =>
           record.imageUploaded.includes(value),
+      },
+      {
+        title: 'Harvester Name',
+        dataIndex: 'harvesterName',
+        key: 'harvesterName',
+        filterDropdown: ({ setSelectedKeys, selectedKeys, confirm, clearFilters }: any) => (
+          <div style={{ padding: 8 }}>
+            <Select
+              showSearch
+              placeholder="Search harvester name"
+              value={selectedKeys[0]}
+              onChange={(value) => setSelectedKeys(value ? [value] : [])}
+              style={{ width: 188, marginBottom: 8, display: 'block' }}
+            >
+              {uniqueHarvesterNames.map((harvesterName) => (
+                <Option key={harvesterName} value={harvesterName}>
+                  {harvesterName}
+                </Option>
+              ))}
+            </Select>
+            <Button
+              type="primary"
+              onClick={() => confirm()}
+              size="small"
+              style={{ width: 90, marginRight: 8, backgroundColor: '#ff6929', borderColor: '#ff6929' }}
+            >
+              Filter
+            </Button>
+            <Button onClick={() => clearFilters()} size="small" style={{ width: 90 }}>
+              Reset
+            </Button>
+          </div>
+        ),
+        onFilter: (value: any, record: any) =>
+          record.harvesterName.toLowerCase().includes(value.toLowerCase()),
       },
       {
       title: 'Branch Name',
@@ -264,11 +196,14 @@ const PalmListTable: React.FC = () => {
       dataIndex: 'numberOfFruits',
       key: 'numberOfFruits',
       sorter: (a: any, b: any) => a.numberOfFruits - b.numberOfFruits,
+      render: (numberOfFruits: number) => (
+        <Tag color="green">{`Total: ${numberOfFruits}`}</Tag>
+      ),
     },
     {
       title: 'Unripe',
-      dataIndex: 'unripe',
-      key: 'unripe',
+      dataIndex: 'unRipe',
+      key: 'unRipe',
       render: (unripe: number) => (
         <Tag color="blue">{`Unripe: ${unripe}`}</Tag>
       ),
@@ -314,7 +249,7 @@ const PalmListTable: React.FC = () => {
   return (
     <div className="">
       <Table
-        dataSource={extractedData}
+        dataSource={palmListData}
         columns={columns}
         onChange={(pagination, filters, sorter) => console.log(pagination, filters, sorter)}
         scroll={{ x: true }}
