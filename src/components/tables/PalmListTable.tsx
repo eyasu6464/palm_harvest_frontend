@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Table, Tag, Input, Button, Select, notification } from 'antd';
+import { Table, Tag, Input, Button, Select, notification, Spin } from 'antd';
 import axios from 'axios';
 import { URL } from '../../redux/ActionTypes';
 import { getCookie } from 'typescript-cookie';
@@ -52,7 +52,9 @@ const PalmListTable: React.FC = () => {
   
       fetchPalmListData();
     }, []);
-
+    if (loading) {
+      return <Spin />;
+    }
   const columns = [
     {
       title: 'Image ID',
