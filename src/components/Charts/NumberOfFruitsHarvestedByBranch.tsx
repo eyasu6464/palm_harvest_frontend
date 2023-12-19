@@ -1,9 +1,9 @@
-import  { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import axios from 'axios';
-import { URL } from '../../redux/ActionTypes';
-import { getCookie } from 'typescript-cookie'; 
-import { Bar } from 'react-chartjs-2';
 import { Spin } from 'antd';
+import { Bar } from 'react-chartjs-2';
+import { URL } from '../../redux/ActionTypes';
+import { getCookie } from 'typescript-cookie';
 import {
   Chart as ChartJS,
   CategoryScale,
@@ -23,44 +23,30 @@ ChartJS.register(
   Legend
 );
 
-const BranchVSHarvesterRelation = () => {
+const NumberOfFruitsHarvestedByBranch = () => {
   const userAccessKey = getCookie('userAccessKey');
-  const [harvesterData, setHarvesterData] = useState({
+  const [palmListData, setPalmListData] = useState({
     labels: [],
-    datasets: [
-      {
-        label: 'Number of Harvesters',
-        data: [],
-        borderColor: 'rgb(255, 105, 41)',
-        backgroundColor: 'rgba(255, 105, 41, 0.5)',
-      },
-    ],
+    data: [],
   });
   const [loading, setLoading] = useState(false);
 
-  const fetchHarvesterData = async () => {
+  const fetchPalmListData = async () => {
     try {
       setLoading(true);
       // Assuming URL and userAccessKey are defined somewhere in your code
-      const response = await axios.get(`${URL}getharvesterscountbybranch/`, {
+      const response = await axios.get(`${URL}getpalmssummarybybranch/`, {
         headers: {
           Authorization: `Bearer ${userAccessKey}`,
           'Content-Type': 'application/json',
         },
       });
-      setHarvesterData({
+      setPalmListData({
         labels: response.data.labels,
-        datasets: [
-          {
-            label: 'Number of Harvesters',
-            data: response.data.data,
-            borderColor: 'rgb(255, 105, 41)',
-            backgroundColor: 'rgba(255, 105, 41, 0.5)',
-          },
-        ],
+        data: response.data.data,
       });
     } catch (error) {
-      console.error('Error fetching harvester data:', error);
+      console.error('Error fetching palm list data:', error);
       // Handle error and show notification
     } finally {
       setLoading(false);
@@ -68,7 +54,7 @@ const BranchVSHarvesterRelation = () => {
   };
 
   useEffect(() => {
-    fetchHarvesterData();
+    fetchPalmListData();
   }, []);
 
   const options = {
@@ -79,7 +65,7 @@ const BranchVSHarvesterRelation = () => {
       },
       title: {
         display: false,
-        text: 'Number of Harvesters in Each Branch',
+        text: 'Images Uploaded by Branch',
       },
     },
     scales: {
@@ -87,7 +73,7 @@ const BranchVSHarvesterRelation = () => {
         beginAtZero: true,
         title: {
           display: true,
-          text: 'Number of Harvesters',
+          text: 'Number of Images',
         },
       },
       x: {
@@ -99,18 +85,30 @@ const BranchVSHarvesterRelation = () => {
     },
   };
 
+  const imageData = {
+    labels: palmListData.labels,
+    datasets: [
+      {
+        label: 'Number of Fruits Harvested',
+        data: palmListData.data,
+        borderColor: 'rgb(255, 105, 41)',
+        backgroundColor: 'rgba(255, 105, 41, 0.5)',
+      },
+    ],
+  };
+
   return (
     <div className='w-96 drop-shadow-xl m-2 p-4 bg-white rounded-md'>
       <p style={{ color: '#ff6929' }} className='font-semibold'>
-        Number Of Harvesters In Branches
+        Number of fruits harvested by Branch
       </p>
       {loading ? (
         <Spin/>
       ) : (
-        <Bar options={options} data={harvesterData} />
+        <Bar options={options} data={imageData} />
       )}
     </div>
   );
 };
 
-export default BranchVSHarvesterRelation;
+export default NumberOfFruitsHarvestedByBranch;
