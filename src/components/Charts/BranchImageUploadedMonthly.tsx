@@ -54,11 +54,10 @@ const BranchImageUploadedMonthly: React.FC = () => {
   return (
     <div className='w-96 drop-shadow-xl m-2 p-4 bg-white rounded-md'>
     <p style={{color:"#ff6929"}} className='font-semibold'>Monthly Branch Fruits Harvested</p>
-      <Select style={{ width: 200 }} defaultValue={selectedBranch} onChange={handleBranchChange}>
+      <Select style={{ width: '100%', marginBottom: 8, display: 'block' }} defaultValue={selectedBranch} onChange={handleBranchChange}>
         <Option value="branch1">Branch 1</Option>
         <Option value="branch2">Branch 2</Option>
         <Option value="branch3">Branch 3</Option>
-        {/* Add more branches as needed */}
       </Select>
       <Line options={options} data={data} />
     </div>
