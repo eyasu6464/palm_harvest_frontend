@@ -1,70 +1,111 @@
 import { useState, useEffect } from "react";
-import { Select, Descriptions, Tag } from "antd";
+import { Select, Descriptions, Tag, Spin, notification } from "antd";
+import axios from "axios";
+import { URL } from '../../redux/ActionTypes';
+import { getCookie } from 'typescript-cookie';
+
+interface HarvesterData {
+  harvesterid: number;
+  full_name: string;
+  image_count: number;
+  total_fruits_collected: number;
+  start_date: string;
+  last_date: string;
+}
 
 const { Option } = Select;
 
-const sampleData = [
-  ["Harvester1", "2023-01-01", "2023-01-05", 10],
-  ["Harvester2", "2023-01-02", "2023-01-06", 15],
-  ["Harvester3", "2023-01-03", "2023-01-07", 20],
-  ["Harvester4", "2023-01-04", "2023-01-08", 25],
-  ["Harvester5", "2023-01-05", "2023-01-09", 30],
-  ["Harvester6", "2023-01-06", "2023-01-10", 35],
-  ["Harvester7", "2023-01-07", "2023-01-11", 40],
-  ["Harvester8", "2023-01-08", "2023-01-12", 45],
-  ["Harvester9", "2023-01-09", "2023-01-13", 50],
-  ["Harvester10", "2023-01-10", "2023-01-14", 55],
-];
-
 const HarvestersTimeLine = () => {
-  const [selectedHarvester, setSelectedHarvester] = useState<any>("");
+  const [selectedHarvester, setSelectedHarvester] = useState<number | null>(null);
+  const [harvestersData, setHarvestersData] = useState<HarvesterData[] | null>(null);
+  const userAccessKey = getCookie('userAccessKey');
+  const [loading, setLoading] = useState<boolean>(false);
 
   useEffect(() => {
-    // Set the default harvester to the first one in sampleData
-    setSelectedHarvester(sampleData[0][0]);
+    const fetchData = async () => {
+      try {
+        setLoading(true);
+
+        const response = await axios.get(`${URL}harvesterpalmconnectedsummary/`, {
+          headers: {
+            Authorization: `Bearer ${userAccessKey}`,
+            'Content-Type': 'application/json',
+          },
+        });
+
+        setHarvestersData(response.data);
+
+        // Set the default harvester to the first one in the fetched data
+        setSelectedHarvester(response.data && response.data.length > 0 ? response.data[0].harvesterid : null);
+
+      } catch (error) {
+        console.error('Error fetching harvester data:', error);
+        notification.error({
+          message: 'Error',
+          description: 'Failed to fetch harvester data. Please try again.',
+        });
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchData();
   }, []);
 
-  const handleHarvesterChange = (value:any) => {
+  const handleHarvesterChange = (value: number) => {
     setSelectedHarvester(value);
   };
 
-  const getHarvesterData = (harvester:any) => {
-    return sampleData.find((data) => data[0] === harvester);
-  };
-
-  const filteredData = getHarvesterData(selectedHarvester);
+  const selectedHarvesterData = harvestersData?.find(
+    (harvester) => harvester.harvesterid === selectedHarvester
+  );
 
   return (
     <div className="w-96 drop-shadow-xl m-2 p-4 bg-white rounded-md">
-      <p style={{color:"#ff6929"}} className='font-semibold'>Harvesters Workflow</p>
+      <p style={{ color: "#ff6929" }} className="font-semibold">
+        Harvesters Workflow
+      </p>
       <Select
         placeholder="Harvester Name"
         style={{ width: '100%', marginBottom: 8, display: 'block' }}
         onChange={handleHarvesterChange}
         value={selectedHarvester}
       >
-        <Option value="">All</Option>
-        {sampleData.map((data) => (
-          <Option key={data[0]} value={data[0]}>
-            {data[0]}
+        {loading ? (
+          <Option disabled value={null}>
+            Loading...
           </Option>
-        ))}
-      </Select>
-      <Descriptions bordered column={1} style={{ marginTop: '16px' }}>
-        {filteredData && (
+        ) : (
           <>
-            <Descriptions.Item label="Started Date:">
-              <Tag color="blue">{filteredData[1]}</Tag>
-            </Descriptions.Item>
-            <Descriptions.Item label="Last Date">
-              <Tag color="blue">{filteredData[2]}</Tag>
-            </Descriptions.Item>
-            <Descriptions.Item label="Palms Collected">
-              <Tag color="blue">{`${filteredData[3]} Total`}</Tag>
-            </Descriptions.Item>
+            <Option value={null}>All</Option>
+            {harvestersData?.map((harvester: HarvesterData) => (
+              <Option key={harvester.harvesterid} value={harvester.harvesterid}>
+                {harvester.full_name}
+              </Option>
+            ))}
           </>
         )}
-      </Descriptions>
+      </Select>
+      <Spin spinning={loading}>
+        <Descriptions bordered column={1} style={{ marginTop: '16px' }}>
+          {selectedHarvesterData && (
+            <>
+              <Descriptions.Item label="Harvester ID:">
+                <Tag color="blue">{selectedHarvesterData.harvesterid}</Tag>
+              </Descriptions.Item>
+              <Descriptions.Item label="Started Date:">
+                <Tag color="blue">{selectedHarvesterData.start_date}</Tag>
+              </Descriptions.Item>
+              <Descriptions.Item label="Last Date">
+                <Tag color="blue">{selectedHarvesterData.last_date}</Tag>
+              </Descriptions.Item>
+              <Descriptions.Item label="Palms Collected">
+                <Tag color="blue">{`${selectedHarvesterData.total_fruits_collected} Total`}</Tag>
+              </Descriptions.Item>
+            </>
+          )}
+        </Descriptions>
+      </Spin>
     </div>
   );
 };
